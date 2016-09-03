@@ -7,137 +7,176 @@
 #define SAGITTAL 'S'
 #define CORONAL 'C'
 
-int getX(Image *img, char mode, char plane, int start, int i, int j) {
-	switch (mode) {
-		case RADIOLOGIST:
-			switch (plane) {
-				case AXIAL:
-					return j;
-				case SAGITTAL:
-					return start;
-				case CORONAL:
-					return j;
-			}
-		case NEUROSURGEON:
-			switch (plane) {
-				case AXIAL:
-					return img->xsize - j;
-				case SAGITTAL:
-					return img->xsize - start;
-				case CORONAL:
-					return j;
-			}
-	}
+typedef enum {
+	X,
+	Y,
+	Z
+} AxisType;
 
-	return -1;
+typedef enum {
+	false,
+	true
+} bool;
+
+typedef struct {
+	AxisType axis;
+	bool inverted;
+} AxisOrientation;
+
+typedef struct {
+	AxisOrientation fixedAxis;
+	AxisOrientation firstAxis;
+	AxisOrientation secondAxis;
+	int start;
+} Axis;
+
+Axis getAxis(AxisType fixedAxis, AxisType firstAxis, bool invertedFixedAxis, bool invertedFirstAxis, bool invertedSecondAxis, int start) {
+	Axis axis;
+
+	axis.start = start;
+	AxisOrientation fixed;
+	fixed.axis = fixedAxis;
+	fixed.inverted = invertedFixedAxis;
+	axis.fixedAxis = fixed;
+
+	AxisOrientation first;
+	first.axis = firstAxis;
+	first.inverted = invertedFirstAxis;
+	axis.firstAxis = first;
+
+	AxisOrientation second;
+	if (fixedAxis == X) {
+		second.axis = firstAxis == Y ? Z : Y;
+	} else if (fixedAxis == Y) {
+		second.axis = firstAxis == X ? Z : X;
+	} else {
+		second.axis = firstAxis == X ? Z : X;
+	}
+	second.inverted = invertedSecondAxis;
+	axis.secondAxis = second;
+
+	return axis;
 }
 
-int getY(Image *img, char mode, char plane, int start, int i, int j) {
-	switch (mode) {
-		case RADIOLOGIST:
-			switch (plane) {
-				case AXIAL:
-					return i;
-				case SAGITTAL:
-					return img->ysize - j;
-				case CORONAL:
-					return start;
-			}
-		case NEUROSURGEON:
-			switch (plane) {
-				case AXIAL:
-					return i;
-				case SAGITTAL:
-					return j;
-				case CORONAL:
-					return start;
-			}
+Axis getAxisForModeAndCut(char mode, char cut, int start) {
+	if (cut == 'C') {
+		return getAxis(Y, X, false, false, true, start);
 	}
 
-	return -1;
-}
-
-int getZ(Image *img, char mode, char plane, int start, int i, int j) {
-	switch (mode) {
-		case RADIOLOGIST:
-			switch (plane) {
-				case AXIAL:
-					return start;
-				case SAGITTAL:
-					return img->zsize - i;
-				case CORONAL:
-					return img->zsize - i;
-			}
-		case NEUROSURGEON:
-			switch (plane) {
-				case AXIAL:
-					return img->zsize - start;
-				case SAGITTAL:
-					return img->zsize - i;
-				case CORONAL:
-					return img->zsize - i;
-			}
+	if (mode == 'R') {
+		if (cut == 'A') {
+			return getAxis(Z, X, false, false, false, start);
+		}
+		return getAxis(X, Y, false, true, true, start);
 	}
 
-	return -1;
+	if (cut == 'A') {
+		return getAxis(Z, X, true, true, false, start);
+	}
+	return getAxis(X, Y, true, false, true, start);
 }
 
-int getColumns(Image *img, char plane) {
-	switch (plane) {
-		case AXIAL:
+int getVoxelX(Image *img, Axis axis, int row, int col) {
+	if (axis.fixedAxis.axis == X) {
+		return axis.fixedAxis.inverted ? img->xsize - axis.start : axis.start;
+	}
+
+	if (axis.firstAxis.axis == X) {
+		return axis.firstAxis.inverted ? img->xsize - col : col;
+	}
+
+	return axis.secondAxis.inverted ? img->xsize - row : row;
+}
+
+int getVoxelY(Image *img, Axis axis, int row, int col) {
+	if (axis.fixedAxis.axis == Y) {
+		return axis.fixedAxis.inverted ? img->ysize - axis.start : axis.start;
+	}
+
+	if (axis.firstAxis.axis == Y) {
+		return axis.firstAxis.inverted ? img->ysize - col : col;
+	}
+
+	return axis.secondAxis.inverted ? img->ysize - row : row;
+}
+
+int getVoxelZ(Image *img, Axis axis, int row, int col) {
+	if (axis.fixedAxis.axis == Z) {
+		return axis.fixedAxis.inverted ? img->zsize - axis.start : axis.start;
+	}
+
+	if (axis.firstAxis.axis == Z) {
+		return axis.firstAxis.inverted ? img->zsize - col : col;
+	}
+
+	return axis.secondAxis.inverted ? img->zsize - row : row;
+}
+
+Voxel getVoxel(Image *img, Axis axis, int row, int col) {
+	Voxel v;
+
+	v.x = getVoxelX(img, axis, row, col);
+	v.y = getVoxelY(img, axis, row, col);
+	v.z = getVoxelZ(img, axis, row, col);
+
+	return v;
+}
+
+int getColumns(Image *img, Axis axis) {
+	switch (axis.firstAxis.axis) {
+		case X:
 			return img->xsize;
-		case SAGITTAL:
+		case Y:
 			return img->ysize;
-		case CORONAL:
+		default:
+			return img->zsize;
+	}
+}
+
+int getLines(Image *img, Axis axis) {
+	switch (axis.secondAxis.axis) {
+		case X:
 			return img->xsize;
-	}
-
-	return -1;
-}
-
-int getLines(Image *img, char plane) {
-	switch (plane) {
-		case AXIAL:
+		case Y:
 			return img->ysize;
-		case SAGITTAL:
-			return img->zsize;
-		case CORONAL:
+		default:
 			return img->zsize;
 	}
-
-	return -1;
 }
 
-void drawPlane(Image *img, char mode, char plane, int start, char* outputFileNamePattern) {
-	char outputFileName[200];
-	sprintf(outputFileName, "%s_%c_%c_%d", outputFileNamePattern, mode, plane, start);
+void drawCut(Image *img, Axis axis, char* outputFileName) {
+	int columns = getColumns(img, axis);
+	int lines = getLines(img, axis);
+	int row, col;
+	Voxel v;
 
-	int columns = getColumns(img, plane);
-	int lines = getLines(img, plane);
-	int i, j, x, y, z;
-
-	float **corte = (float**) malloc(sizeof(float*) * lines);
-	for (i = 0; i < lines; i++) {
-		corte[i] = (float*) malloc(sizeof(float) * columns);
-		for (j = 0; j < columns; j++) {
-			x = getX(img, mode, plane, start, i, j);
-			y = getY(img, mode, plane, start, i, j);
-			z = getZ(img, mode, plane, start, i, j);
-			corte[i][j] = img->val[z * img->ysize * img->xsize + y * img->xsize + x];
+	float **cut = (float**) malloc(sizeof(float*) * lines);
+	for (row = 0; row < lines; row++) {
+		cut[row] = (float*) malloc(sizeof(float) * columns);
+		for (col = 0; col < columns; col++) {
+			v = getVoxel(img, axis, row, col);
+			cut[row][col] = img->val[v.z * img->ysize * img->xsize + v.y * img->xsize + v.x];
 		}
 	}
 
-	saveImage(outputFileName, corte, columns, lines);
+	saveImage(outputFileName, cut, columns, lines);
 
-	for (y = 0; y < lines; y++) {
-		free(corte[y]);
+	for (row = 0; row < lines; row++) {
+		free(cut[row]);
 	}
-	free(corte);
+	free(cut);
+}
+
+void test(Image *img, char mode, char cut, int start, char* outputFileNamePattern) {
+	char outputFileName[200];
+	sprintf(outputFileName, "%s_%c_%c_%d", outputFileNamePattern, mode, cut, start);
+	drawCut(img, getAxisForModeAndCut(mode, cut, start), outputFileName);
 }
 
 int main(int argc, char *argv[]) {
 	Image *img;
 	timer *t1, *t2;
+	int i;
 
 	/*--------------------------------------------------------*/
 	void *trash = malloc(1);
@@ -157,12 +196,22 @@ int main(int argc, char *argv[]) {
 
 	img = ReadImage(argv[1]);
 
-	drawPlane(img, RADIOLOGIST, AXIAL, atoi(argv[3]), argv[2]);
-	drawPlane(img, RADIOLOGIST, SAGITTAL, atoi(argv[3]), argv[2]);
-	drawPlane(img, RADIOLOGIST, CORONAL, atoi(argv[3]), argv[2]);
-	drawPlane(img, NEUROSURGEON, AXIAL, atoi(argv[3]), argv[2]);
-	drawPlane(img, NEUROSURGEON, SAGITTAL, atoi(argv[3]), argv[2]);
-	drawPlane(img, NEUROSURGEON, CORONAL, atoi(argv[3]), argv[2]);
+	printf("Image size: %d x %d x %d\n", img->xsize, img->ysize, img->zsize);
+
+	for (i = 0; i < img->zsize; i++) {
+		test(img, RADIOLOGIST, AXIAL, i, argv[2]);
+		test(img, NEUROSURGEON, AXIAL, i, argv[2]);
+	}
+
+	for (i = 0; i < img->xsize; i++) {
+		test(img, RADIOLOGIST, SAGITTAL, i, argv[2]);
+		test(img, NEUROSURGEON, SAGITTAL, i, argv[2]);
+	}
+
+	for (i = 0; i < img->ysize; i++) {
+		test(img, RADIOLOGIST, CORONAL, i, argv[2]);
+		test(img, NEUROSURGEON, CORONAL, i, argv[2]);
+	}
 
 	t2 = Toc();
 	fprintf(stdout, "Done in %f ms\n",CompTime(t1,t2));
