@@ -169,7 +169,7 @@ void drawCut(Image *img, Axis axis, char* outputFileName) {
 
 void test(Image *img, char mode, char cut, int start, char* outputFileNamePattern) {
 	char outputFileName[200];
-	sprintf(outputFileName, "%s_%c_%c_%d", outputFileNamePattern, mode, cut, start);
+	sprintf(outputFileName, "%s_%c_%c_%04d", outputFileNamePattern, mode, cut, start);
 	drawCut(img, getAxisForModeAndCut(mode, cut, start), outputFileName);
 }
 
