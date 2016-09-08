@@ -1,5 +1,6 @@
-#include "../ex01/bitmap.h"
 #include "ex02.h"
+
+#define ABS(x) ((x >= 0)?x:-x)
 
 float linearTransform(float I, float k1, float k2, float I1, float I2) {
 	if (I < I1) {
@@ -37,49 +38,27 @@ void ajustWindowAndLevel(float window, float level, float** img, int imageWidth,
 	}
 }
 
-int main(int argc, char *argv[]) {
-	Image *img;
-	Image2D cut;
-	timer *t1, *t2;
+Image2D coloredImage2D(Image2D img) {
+	float H = 255.0;
+	float V;
+	int row, col;
+	Image2D colored = newColoredImage2D(img->width, img->height);
 
-	/*--------------------------------------------------------*/
-	void *trash = malloc(1);
-	struct mallinfo info;
-	int MemDinInicial, MemDinFinal;
-	free(trash);
-	info = mallinfo();
-	MemDinInicial = info.uordblks;
-
-	/*--------------------------------------------------------*/
-
-	if (argc != 4) {
-		Error("Usage: ex02.o <input.scn> <window> <level>", "ex02.c - main");
+	for (row = 0; row < colored->height; row ++) {
+		for (col = 0; col < colored->width; col ++) {
+			if (col % 2 != 0 || row % 2 != 0) {
+				colored->r[row][col] = img->img[row][col];
+				colored->g[row][col] = img->img[row][col];
+				colored->b[row][col] = img->img[row][col];
+			} else {
+				V = img->img[row][col] / H;
+				V = (6 - 2) * V + 1;
+				colored->r[row][col] = H * MAX(0, (3 - ABS(V - 4) - ABS(V - 5)) / 2.0);
+				colored->g[row][col] = H * MAX(0, (4 - ABS(V - 2) - ABS(V - 4)) / 2.0);
+				colored->b[row][col] = H * MAX(0, (3 - ABS(V - 1) - ABS(V - 2)) / 2.0);
+			}
+		}
 	}
 
-	t1 = Tic();
-
-	img = ReadImage(argv[1]);
-	printf("Image size: %d x %d x %d\n", img->xsize, img->ysize, img->zsize);
-
-	cut = getCutFromImage(img, getAxisForModeAndCut(RADIOLOGIST, SAGITTAL, 103), argv[2]);
-
-	saveImage("before", cut->img, cut->width, cut->height);
-	ajustWindowAndLevel(atof(argv[2]), atof(argv[3]), cut->img, cut->width, cut->height);
-	saveImage("after", cut->img, cut->width, cut->height);
-
-	t2 = Toc();
-	fprintf(stdout, "Done in %f ms\n",CompTime(t1,t2));
-
-	DestroyImage(img);
-	freeImage2D(cut);
-
-	/* ------------------------------------------------------ */
-
-	info = mallinfo();
-	MemDinFinal = info.uordblks;
-	if (MemDinInicial != MemDinFinal) {
-		printf("\n\nDinamic memory was not completely deallocated (%d, %d)\n", MemDinInicial, MemDinFinal);
-	}
-
-	return 0;
+	return colored;
 }

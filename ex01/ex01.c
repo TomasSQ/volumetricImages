@@ -162,3 +162,37 @@ void freeImage2D(Image2D img) {
 
 	free(img);
 }
+
+Image2D newColoredImage2D(int width, int height) {
+	int row;
+	Image2D img = newImage2D(width, height);
+	img->r = (float**) malloc(sizeof(float*) * height);
+	img->g = (float**) malloc(sizeof(float*) * height);
+	img->b = (float**) malloc(sizeof(float*) * height);
+
+	for (row = 0; row < img->height; row++) {
+		img->r[row] = (float*) malloc(sizeof(float) * img->width);
+		img->g[row] = (float*) malloc(sizeof(float) * img->width);
+		img->b[row] = (float*) malloc(sizeof(float) * img->width);
+	}
+
+	return img;
+}
+
+void freeColoredImage2D(Image2D img) {
+	int row;
+
+	for (row = 0; row < img->height; row++) {
+		free(img->img[row]);
+		free(img->r[row]);
+		free(img->g[row]);
+		free(img->b[row]);
+	}
+
+	free(img->img);
+	free(img->r);
+	free(img->g);
+	free(img->b);
+
+	free(img);
+}

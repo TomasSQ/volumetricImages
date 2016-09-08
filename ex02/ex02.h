@@ -14,3 +14,5 @@
 	k2 se I >= I2
 */
 void ajustWindowAndLevel(float window, float level, float** img, int imageWidth, int imageHeight);
+
+Image2D coloredImage2D(Image2D img);

@@ -31,6 +31,9 @@ typedef struct {
 
 typedef struct {
 	float** img;
+	float** r;
+	float** g;
+	float** b;
 	int width;
 	int height;
 } _image2D;
@@ -40,4 +43,6 @@ Axis getAxisForModeAndCut(char mode, char cut, int start);
 Image2D getCutFromImage(Image *img, Axis axis, char* outputFileName);
 
 Image2D newImage2D(int width, int height);
+Image2D newColoredImage2D(int width, int height);
 void freeImage2D(Image2D img);
+void freeColoredImage2D(Image2D img);

@@ -2,25 +2,29 @@
 
 void writeImage(char* imageName, unsigned char *img, int imageWidth, int imageHeight);
 
+unsigned char getColor(float color) {
+	return (unsigned char) (color > 255 ? color / 255.0 : color);
+}
+
 void saveImage(char* imageName, float **img, int imageWidth, int imageHeight) {
-	int x, y, g;
-	unsigned char *gray = (unsigned char*) malloc(sizeof(unsigned char) * 3 * imageWidth * imageHeight);
+	saveColoredImage(imageName, img, img, img, imageWidth, imageHeight);
+}
+
+void saveColoredImage(char* imageName, float **r, float **g, float **b, int imageWidth, int imageHeight) {
+	int x, y;
+	unsigned char *img = (unsigned char*) malloc(sizeof(unsigned char) * 3 * imageWidth * imageHeight);
 
 	for (y = 0; y < imageHeight; y++) {
 		for (x = 0; x < imageWidth; x++) {
-			g = img[y][x];
-			if (g > 255) {
-				g = 255;
-			}
-			gray[(x + y * imageWidth) * 3 + 2] = (unsigned char) g;
-			gray[(x + y * imageWidth) * 3 + 1] = (unsigned char) g;
-			gray[(x + y * imageWidth) * 3 + 0] = (unsigned char) g;
+			img[(x + y * imageWidth) * 3 + 2] = getColor(r[y][x]);
+			img[(x + y * imageWidth) * 3 + 1] = getColor(g[y][x]);
+			img[(x + y * imageWidth) * 3 + 0] = getColor(b[y][x]);
 		}
 	}
 
-	writeImage(imageName, gray, imageWidth, imageHeight);
+	writeImage(imageName, img, imageWidth, imageHeight);
 
-	free(gray);
+	free(img);
 }
 
 void writeImage(char* imageName, unsigned char *img, int imageWidth, int imageHeight) {
