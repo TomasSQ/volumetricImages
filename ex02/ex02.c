@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 	img = ReadImage(argv[1]);
 	printf("Image size: %d x %d x %d\n", img->xsize, img->ysize, img->zsize);
 
-	cut = getCutFromImage(img, getAxisForModeAndCut(RADIOLOGIST, SAGITTAL, atoi(argv[3])), argv[2]);
+	cut = getCutFromImage(img, getAxisForModeAndCut(RADIOLOGIST, SAGITTAL, 103), argv[2]);
 
 	saveImage("before", cut->img, cut->width, cut->height);
 	ajustWindowAndLevel(atof(argv[2]), atof(argv[3]), cut->img, cut->width, cut->height);
@@ -71,6 +71,7 @@ int main(int argc, char *argv[]) {
 	fprintf(stdout, "Done in %f ms\n",CompTime(t1,t2));
 
 	DestroyImage(img);
+	freeImage2D(cut);
 
 	/* ------------------------------------------------------ */
 
