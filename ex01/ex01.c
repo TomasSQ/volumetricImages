@@ -121,33 +121,58 @@ int getLines(Image *img, Axis axis) {
 	}
 }
 
-void drawCut(Image *img, Axis axis, char* outputFileName) {
+Image2D getCutFromImage(Image *img, Axis axis, char* outputFileName) {
 	int columns = getColumns(img, axis);
 	int lines = getLines(img, axis);
 	int row, col;
 	Voxel v;
+	Image2D image2D = newImage2D(columns, lines);
 
-	float **cut = (float**) malloc(sizeof(float*) * lines);
-	for (row = 0; row < lines; row++) {
-		cut[row] = (float*) malloc(sizeof(float) * columns);
-		for (col = 0; col < columns; col++) {
+	for (row = 0; row < image2D->height; row++) {
+		for (col = 0; col < image2D->width; col++) {
 			v = getVoxel(img, axis, row, col);
-			cut[row][col] = img->val[v.z * img->ysize * img->xsize + v.y * img->xsize + v.x];
+			image2D->img[row][col] = img->val[v.z * img->ysize * img->xsize + v.y * img->xsize + v.x];
 		}
 	}
 
-	saveImage(outputFileName, cut, columns, lines);
+	return image2D;
+}
 
-	for (row = 0; row < lines; row++) {
-		free(cut[row]);
+Image2D newImage2D(int width, int height) {
+	int row;
+	Image2D img = (Image2D) malloc(sizeof(_image2D));
+	img->img = (float**) malloc(sizeof(float*) * height);
+	img->width = width;
+	img->height = height;
+
+	for (row = 0; row < img->height; row++) {
+		img->img[row] = (float*) malloc(sizeof(float) * img->width);
 	}
-	free(cut);
+
+	return img;
+}
+
+void freeImage2D(Image2D img) {
+	int row;
+
+	for (row = 0; row < img->height; row++) {
+		free(img->img[row]);
+	}
+
+	free(img->img);
+
+	free(img);
 }
 
 void test(Image *img, char mode, char cut, int start, char* outputFileNamePattern) {
 	char outputFileName[200];
+	Image2D image2D;
+
 	sprintf(outputFileName, "%s_%c_%c_%04d", outputFileNamePattern, mode, cut, start);
-	drawCut(img, getAxisForModeAndCut(mode, cut, start), outputFileName);
+	image2D = getCutFromImage(img, getAxisForModeAndCut(mode, cut, start), outputFileName);
+	saveImage(outputFileName, image2D->img, image2D->width, image2D->height);
+
+	freeImage2D(image2D);
 }
 
 int main(int argc, char *argv[]) {
