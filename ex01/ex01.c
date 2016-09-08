@@ -1,34 +1,11 @@
-#include "mo815-3dvis.h"
 #include "bitmap.h"
+#include "ex01.h"
 
 #define RADIOLOGIST 'R'
 #define NEUROSURGEON 'N'
 #define AXIAL 'A'
 #define SAGITTAL 'S'
 #define CORONAL 'C'
-
-typedef enum {
-	X,
-	Y,
-	Z
-} AxisType;
-
-typedef enum {
-	false,
-	true
-} bool;
-
-typedef struct {
-	AxisType axis;
-	bool inverted;
-} AxisOrientation;
-
-typedef struct {
-	AxisOrientation fixedAxis;
-	AxisOrientation firstAxis;
-	AxisOrientation secondAxis;
-	int start;
-} Axis;
 
 Axis getAxis(AxisType fixedAxis, AxisType firstAxis, bool invertedFixedAxis, bool invertedFirstAxis, bool invertedSecondAxis, int start) {
 	Axis axis;
