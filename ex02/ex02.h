@@ -13,6 +13,6 @@
 	(k2 - k1) / (I2 - I1) * (I - I1) + k1 se I1 <= I < I2
 	k2 se I >= I2
 */
-void ajustWindowAndLevel(float window, float level, float** img, int imageWidth, int imageHeight);
+void ajustWindowAndLevel(float window, float level, int** img, int imageWidth, int imageHeight);
 
 Image2D coloredImage2D(Image2D img);

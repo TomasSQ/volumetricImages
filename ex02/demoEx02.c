@@ -30,10 +30,10 @@ int main(int argc, char *argv[]) {
 	printf("Image size: %d x %d x %d\n", img->xsize, img->ysize, img->zsize);
 
 	for (i = 0; i < img->zsize; i++) {
-		cut = getCutFromImage(img, getAxisForModeAndCut(RADIOLOGIST, CORONAL, i), argv[2]);
+		cut = getCutFromImage(img, getAxisForModeAndCut(RADIOLOGIST, AXIAL, i), argv[2]);
 
 		// saveImage("before", cut->img, cut->width, cut->height);
-		//ajustWindowAndLevel(atof(argv[2]), atof(argv[3]), cut->img, cut->width, cut->height);
+		ajustWindowAndLevel(atof(argv[2]), atof(argv[3]), cut->img, cut->width, cut->height);
 		//saveImage("after", cut->img, cut->width, cut->height);
 		cutColored = coloredImage2D(cut);
 		sprintf(outputFileName, "afterColored_%04d", i);

@@ -140,12 +140,12 @@ Image2D getCutFromImage(Image *img, Axis axis, char* outputFileName) {
 Image2D newImage2D(int width, int height) {
 	int row;
 	Image2D img = (Image2D) malloc(sizeof(_image2D));
-	img->img = (float**) malloc(sizeof(float*) * height);
+	img->img = (int**) malloc(sizeof(int*) * height);
 	img->width = width;
 	img->height = height;
 
 	for (row = 0; row < img->height; row++) {
-		img->img[row] = (float*) malloc(sizeof(float) * img->width);
+		img->img[row] = (int*) malloc(sizeof(int) * img->width);
 	}
 
 	return img;
@@ -166,14 +166,14 @@ void freeImage2D(Image2D img) {
 Image2D newColoredImage2D(int width, int height) {
 	int row;
 	Image2D img = newImage2D(width, height);
-	img->r = (float**) malloc(sizeof(float*) * height);
-	img->g = (float**) malloc(sizeof(float*) * height);
-	img->b = (float**) malloc(sizeof(float*) * height);
+	img->r = (int**) malloc(sizeof(int*) * height);
+	img->g = (int**) malloc(sizeof(int*) * height);
+	img->b = (int**) malloc(sizeof(int*) * height);
 
 	for (row = 0; row < img->height; row++) {
-		img->r[row] = (float*) malloc(sizeof(float) * img->width);
-		img->g[row] = (float*) malloc(sizeof(float) * img->width);
-		img->b[row] = (float*) malloc(sizeof(float) * img->width);
+		img->r[row] = (int*) malloc(sizeof(int) * img->width);
+		img->g[row] = (int*) malloc(sizeof(int) * img->width);
+		img->b[row] = (int*) malloc(sizeof(int) * img->width);
 	}
 
 	return img;

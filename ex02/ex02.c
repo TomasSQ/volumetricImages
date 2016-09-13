@@ -13,7 +13,7 @@ float linearTransform(float I, float k1, float k2, float I1, float I2) {
 	return (k2 - k1) / (I2 - I1) * (I - I1) + k1;
 }
 
-void ajustWindowAndLevel(float window, float level, float** img, int imageWidth, int imageHeight) {
+void ajustWindowAndLevel(float window, float level, int** img, int imageWidth, int imageHeight) {
 	float H = 255.0; /*Mudar para 2^b - 1, com b sendo numero de bits para cada canal de cores*/
 	float k2 = H;
 	float k1 = 0.0;
@@ -33,7 +33,7 @@ void ajustWindowAndLevel(float window, float level, float** img, int imageWidth,
 
 	for (row = 0; row < imageHeight; row++) {
 		for (col = 0; col < imageWidth; col++) {
-			img[row][col] = linearTransform(img[row][col], k1, k2, I1, I2);
+			img[row][col] = (int) linearTransform(img[row][col], k1, k2, I1, I2);
 		}
 	}
 }

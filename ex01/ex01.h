@@ -30,10 +30,10 @@ typedef struct {
 } Axis;
 
 typedef struct {
-	float** img;
-	float** r;
-	float** g;
-	float** b;
+	int** img;
+	int** r;
+	int** g;
+	int** b;
 	int width;
 	int height;
 } _image2D;

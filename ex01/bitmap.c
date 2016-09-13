@@ -1,30 +1,101 @@
+#include <limits.h>
+
 #include "bitmap.h"
+
+typedef struct {
+	int min;
+	int max;
+} range;
 
 void writeImage(char* imageName, unsigned char *img, int imageWidth, int imageHeight);
 
-unsigned char getColor(float color) {
-	return (unsigned char) (color > 255 ? color / 255.0 : color);
-}
+range getRange(int **img, int imageWidth, int imageHeight) {
+	int	row, col;
 
-void saveImage(char* imageName, float **img, int imageWidth, int imageHeight) {
-	saveColoredImage(imageName, img, img, img, imageWidth, imageHeight);
-}
-
-void saveColoredImage(char* imageName, float **r, float **g, float **b, int imageWidth, int imageHeight) {
-	int x, y;
-	unsigned char *img = (unsigned char*) malloc(sizeof(unsigned char) * 3 * imageWidth * imageHeight);
-
-	for (y = 0; y < imageHeight; y++) {
-		for (x = 0; x < imageWidth; x++) {
-			img[(x + y * imageWidth) * 3 + 2] = getColor(r[y][x]);
-			img[(x + y * imageWidth) * 3 + 1] = getColor(g[y][x]);
-			img[(x + y * imageWidth) * 3 + 0] = getColor(b[y][x]);
+	range r;
+	r.max = INT_MIN;
+	r.min = INT_MAX;
+	for (row = 0; row < imageHeight; row++) {
+		for (col = 0; col < imageWidth; col++) {
+			if (img[row][col] < 0 || img[row][col] > (1<<16)) {
+				img[row][col] = 0;
+			}
+			if (img[row][col] > r.max) {
+				r.max = img[row][col];
+			}
+			if (img[row][col] < r.min) {
+				r.min = img[row][col];
+			}
 		}
 	}
 
-	writeImage(imageName, img, imageWidth, imageHeight);
+	return r;
+}
 
-	free(img);
+void saveImage(char* imageName, int **img, int imageWidth, int imageHeight) {
+	FILE *fp = NULL;
+	unsigned char *data = NULL;
+	int row, col;
+	range r = getRange(img, imageWidth, imageHeight);
+
+	char imgNameWithExtension[200];
+	sprintf(imgNameWithExtension, "%s.pgm", imageName);
+	fp = fopen(imgNameWithExtension, "w");
+	if (r.max - r.min >= 0 && r.max - r.min < 256) {
+		fprintf(fp,"P5\n");
+		fprintf(fp,"%d %d\n", imageWidth, imageHeight);
+		fprintf(fp,"%d\n", r.max);
+
+		data = (unsigned char*) malloc(sizeof(unsigned char) * imageWidth * imageHeight);
+		for (row = 0; row < imageHeight; row++) {
+			for (col = 0; col < imageWidth; col++) {
+				data[row * imageWidth + col] = (unsigned char) img[row][col] - r.min;
+			}
+		}
+
+		fwrite(data, sizeof(unsigned char), imageWidth * imageHeight, fp);
+		free(data);
+	} else {
+		fprintf(fp, "P2\n");
+		fprintf(fp, "%d %d\n", imageWidth, imageHeight);
+		fprintf(fp, "%d\n", r.max - r.min);
+
+		for (row = 0; row < imageHeight; row++) {
+			for (col = 0; col < imageWidth; col++) {
+				fprintf(fp, "%d ", (int) (img[row][col] - r.min));
+			}
+			if (row % 17 == 0) {
+				fprintf(fp, "\n");
+			}
+		}
+
+	}
+	fclose(fp);
+}
+
+void saveColoredImage(char* imageName, int **r, int **g, int **b, int imageWidth, int imageHeight) {
+	FILE *fp=NULL;
+	int	row, col;
+	int maxR = getRange(r, imageWidth, imageHeight).max;
+	int maxG = getRange(g, imageWidth, imageHeight).max;
+	int maxB = getRange(b, imageWidth, imageHeight).max;
+	char imgNameWithExtension[200];
+	sprintf(imgNameWithExtension, "%s.pgm", imageName);
+
+	fp = fopen(imgNameWithExtension, "w");
+	fprintf(fp, "P6\n");
+	fprintf(fp, "%d %d\n", imageWidth, imageHeight);
+	fprintf(fp, "255\n");
+
+	for (row = 0; row < imageHeight; row++) {
+		for (col = 0; col < imageWidth; col++) {
+			fputc((unsigned char) (r[row][col] * 1.0 / maxR * 256), fp);
+			fputc((unsigned char) (g[row][col] * 1.0 / maxG * 256), fp);
+			fputc((unsigned char) (b[row][col] * 1.0 / maxB * 256), fp);
+		}
+	}
+
+	fclose(fp);
 }
 
 void writeImage(char* imageName, unsigned char *img, int imageWidth, int imageHeight) {
