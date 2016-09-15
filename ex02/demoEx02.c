@@ -3,8 +3,10 @@
 #include "ex02.h"
 
 int main(int argc, char *argv[]) {
-	Image *img;
+	Image *img = NULL;
+	Image *label = NULL;
 	Image2D cut = NULL;
+	Image2D cutLabel = NULL;
 	Image2D cutColored = NULL;
 	timer *t1, *t2;
 	char outputFileName[200];
@@ -20,8 +22,8 @@ int main(int argc, char *argv[]) {
 
 	/*--------------------------------------------------------*/
 
-	if (argc != 4) {
-		Error("Usage: ex02.o <input.scn> <window> <level>", "ex02.c - main");
+	if (argc != 4 && argc != 5) {
+		Error("Usage: ex02.o <input.scn> <window> <level> [input-label.scn]", "ex02.c - main");
 	}
 
 	t1 = Tic();
@@ -29,13 +31,26 @@ int main(int argc, char *argv[]) {
 	img = ReadImage(argv[1]);
 	printf("Image size: %d x %d x %d\n", img->xsize, img->ysize, img->zsize);
 
+	if (argc == 5) {
+		label = ReadImage(argv[4]);
+		printf("Label size: %d x %d x %d\n", label->xsize, label->ysize, label->zsize);
+	}
+
 	for (i = 0; i < img->zsize; i++) {
-		cut = getCutFromImage(img, getAxisForModeAndCut(RADIOLOGIST, AXIAL, i), argv[2]);
+		cut = getCutFromImage(img, getAxisForModeAndCut(RADIOLOGIST, CORONAL, i), argv[2]);
+		if (label != NULL) {
+			printf("Coloring using label\n");
+			cutLabel = getCutFromImage(label, getAxisForModeAndCut(RADIOLOGIST, CORONAL, i), argv[2]);
+		}
 
 		// saveImage("before", cut->img, cut->width, cut->height);
 		ajustWindowAndLevel(atof(argv[2]), atof(argv[3]), cut->img, cut->width, cut->height);
 		//saveImage("after", cut->img, cut->width, cut->height);
-		cutColored = coloredImage2D(cut);
+		if (cutLabel == NULL) {
+			cutColored = coloredImage2D(cut);
+		} else {
+			cutColored = coloredLabelImage2D(cut, cutLabel);
+		}
 		sprintf(outputFileName, "out/afterColored_%04d", i);
 		saveColoredImage(outputFileName, cutColored->r, cutColored->g, cutColored->b, cutColored->width, cutColored->height);
 

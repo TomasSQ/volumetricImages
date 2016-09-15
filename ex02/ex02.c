@@ -1,5 +1,11 @@
 #include "ex02.h"
 
+typedef struct {
+	int r;
+	int g;
+	int b;
+} RGB;
+
 float linearTransform(float I, float k1, float k2, float I1, float I2) {
 	if (I < I1) {
 		return k1;
@@ -36,10 +42,20 @@ void ajustWindowAndLevel(float window, float level, int** img, int imageWidth, i
 	}
 }
 
-Image2D coloredImage2D(Image2D img) {
-	float H = getRange(img->img, img->width, img->height).max;
-	float V;
+RGB getColor(float intensity, float maxIntensity) {
+	RGB rgb;
+	float V = (6 - 2) * intensity / maxIntensity + 1;
+
+	rgb.r = 255 * MAX(0, (3 - ABS(V - 4) - ABS(V - 5)) / 2.0);
+	rgb.g = 255 * MAX(0, (4 - ABS(V - 2) - ABS(V - 4)) / 2.0);
+	rgb.b = 255 * MAX(0, (3 - ABS(V - 1) - ABS(V - 2)) / 2.0);
+
+	return rgb;
+}
+
+Image2D colored(Image2D img, Image2D label, float maxIntensity) {
 	int row, col;
+	RGB rgb;
 	Image2D colored = newColoredImage2D(img->width, img->height);
 
 	for (row = 0; row < colored->height; row ++) {
@@ -49,14 +65,21 @@ Image2D coloredImage2D(Image2D img) {
 				colored->g[row][col] = img->img[row][col];
 				colored->b[row][col] = img->img[row][col];
 			} else {
-				V = img->img[row][col] / H;
-				V = (6 - 2) * V + 1;
-				colored->r[row][col] = 255 * MAX(0, (3 - ABS(V - 4) - ABS(V - 5)) / 2.0);
-				colored->g[row][col] = 255 * MAX(0, (4 - ABS(V - 2) - ABS(V - 4)) / 2.0);
-				colored->b[row][col] = 255 * MAX(0, (3 - ABS(V - 1) - ABS(V - 2)) / 2.0);
+				rgb = getColor(label->img[row][col], maxIntensity);
+				colored->r[row][col] = rgb.r;
+				colored->g[row][col] = rgb.g;
+				colored->b[row][col] = rgb.b;
 			}
 		}
 	}
 
 	return colored;
+}
+
+Image2D coloredImage2D(Image2D img) {
+	return colored(img, img, getRange(img->img, img->width, img->height).max);
+}
+
+Image2D coloredLabelImage2D(Image2D img, Image2D label) {
+	return colored(img, label, getRange(label->img, label->width, label->height).max);
 }

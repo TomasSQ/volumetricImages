@@ -9,7 +9,7 @@ clean:
 	rm -rf ex02.o out
 
 run:
-	mkdir -p out && rm -f out/afterColored_0* && clear && make && ./ex02.o ../libmo815-3dvis/data/skull.scn 80 20
+	mkdir -p out && rm -f out/afterColored_0* && clear && make && ./ex02.o ../libmo815-3dvis/data/brain.scn 80 20 ../libmo815-3dvis/data/brain-label.scn
 
 gif:
 	convert -delay 0 -loop 0 out/afterColored_*.pgm ~/Desktop/afterColored.gif

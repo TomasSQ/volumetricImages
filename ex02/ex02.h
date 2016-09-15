@@ -16,3 +16,5 @@
 void ajustWindowAndLevel(float window, float level, int** img, int imageWidth, int imageHeight);
 
 Image2D coloredImage2D(Image2D img);
+
+Image2D coloredLabelImage2D(Image2D img, Image2D label);
