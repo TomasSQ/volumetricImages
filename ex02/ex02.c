@@ -39,23 +39,23 @@ void ajustWindowAndLevel(float window, float level, int** img, int imageWidth, i
 }
 
 Image2D coloredImage2D(Image2D img) {
-	float H = 255.0;
+	float H = 4095;
 	float V;
 	int row, col;
 	Image2D colored = newColoredImage2D(img->width, img->height);
 
 	for (row = 0; row < colored->height; row ++) {
 		for (col = 0; col < colored->width; col ++) {
-			if (col % 2 != 0 || row % 2 != 0) {
+			if (col % 3 != 0 || row % 3 != 0) {
 				colored->r[row][col] = img->img[row][col];
 				colored->g[row][col] = img->img[row][col];
 				colored->b[row][col] = img->img[row][col];
 			} else {
 				V = img->img[row][col] / H;
 				V = (6 - 2) * V + 1;
-				colored->r[row][col] = H * MAX(0, (3 - ABS(V - 4) - ABS(V - 5)) / 2.0);
-				colored->g[row][col] = H * MAX(0, (4 - ABS(V - 2) - ABS(V - 4)) / 2.0);
-				colored->b[row][col] = H * MAX(0, (3 - ABS(V - 1) - ABS(V - 2)) / 2.0);
+				colored->r[row][col] = 255 * MAX(0, (3 - ABS(V - 4) - ABS(V - 5)) / 2.0);
+				colored->g[row][col] = 255 * MAX(0, (4 - ABS(V - 2) - ABS(V - 4)) / 2.0);
+				colored->b[row][col] = 255 * MAX(0, (3 - ABS(V - 1) - ABS(V - 2)) / 2.0);
 			}
 		}
 	}

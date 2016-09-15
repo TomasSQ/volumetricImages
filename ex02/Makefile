@@ -6,4 +6,10 @@ all:
 	gcc $(FLAGS) demoEx02.c ex02.c ../ex01/ex01.c ../ex01/bitmap.c -o ex02.o $(MO815-3DVIS-FLAGS) $(MO815-3DVIS-LIB) ;
 
 clean:
-	rm ex02.o
+	rm -rf ex02.o out
+
+run:
+	mkdir -p out && rm -f out/afterColored_0* && clear && make && ./ex02.o ../libmo815-3dvis/data/brain.scn 60 60
+
+gif:
+	convert -delay 0 -loop 0 out/afterColored_*.pgm ~/Desktop/afterColored.gif

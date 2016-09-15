@@ -33,10 +33,10 @@ int main(int argc, char *argv[]) {
 		cut = getCutFromImage(img, getAxisForModeAndCut(RADIOLOGIST, AXIAL, i), argv[2]);
 
 		// saveImage("before", cut->img, cut->width, cut->height);
-		ajustWindowAndLevel(atof(argv[2]), atof(argv[3]), cut->img, cut->width, cut->height);
+		//ajustWindowAndLevel(atof(argv[2]), atof(argv[3]), cut->img, cut->width, cut->height);
 		//saveImage("after", cut->img, cut->width, cut->height);
 		cutColored = coloredImage2D(cut);
-		sprintf(outputFileName, "afterColored_%04d", i);
+		sprintf(outputFileName, "out/afterColored_%04d", i);
 		saveColoredImage(outputFileName, cutColored->r, cutColored->g, cutColored->b, cutColored->width, cutColored->height);
 
 		freeImage2D(cut);
