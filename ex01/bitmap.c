@@ -44,12 +44,12 @@ void saveImage(char* imageName, int **img, int imageWidth, int imageHeight) {
 	if (r.max - r.min >= 0 && r.max - r.min < 256) {
 		fprintf(fp,"P5\n");
 		fprintf(fp,"%d %d\n", imageWidth, imageHeight);
-		fprintf(fp,"%d\n", r.max);
+		fprintf(fp,"%d\n", r.max - r.min);
 
 		data = (unsigned char*) malloc(sizeof(unsigned char) * imageWidth * imageHeight);
 		for (row = 0; row < imageHeight; row++) {
 			for (col = 0; col < imageWidth; col++) {
-				data[row * imageWidth + col] = (unsigned char) img[row][col] - r.min;
+				data[row * imageWidth + col] = (unsigned char) (img[row][col] - r.min);
 			}
 		}
 

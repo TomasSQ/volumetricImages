@@ -6,4 +6,15 @@ all:
 	gcc $(FLAGS) demoEx01.c ex01.c bitmap.c -o ex01.o $(MO815-3DVIS-FLAGS) $(MO815-3DVIS-LIB) ;
 
 clean:
-	rm ex01.o
+	rm -rf ex01.o out
+
+run:
+	mkdir -p out && rm -f out/z_* && clear && make && ./ex01.o ../libmo815-3dvis/data/brain.scn out/z 25
+
+gif:
+	convert -delay 0 -loop 0 out/z_R_A_*.pgm ~/Desktop/axial01.gif
+	convert -delay 0 -loop 0 out/z_N_A_*.pgm ~/Desktop/axial02.gif
+	convert -delay 0 -loop 0 out/z_R_S_*.pgm ~/Desktop/sagital01.gif
+	convert -delay 0 -loop 0 out/z_N_S_*.pgm ~/Desktop/sagital02.gif
+	convert -delay 0 -loop 0 out/z_R_C_*.pgm ~/Desktop/coronal01.gif
+	convert -delay 0 -loop 0 out/z_N_C_*.pgm ~/Desktop/coronal02.gif

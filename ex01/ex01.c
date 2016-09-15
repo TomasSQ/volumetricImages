@@ -26,7 +26,7 @@ Axis getAxis(AxisType fixedAxis, AxisType firstAxis, bool invertedFixedAxis, boo
 	} else if (fixedAxis == Y) {
 		second.axis = firstAxis == X ? Z : X;
 	} else {
-		second.axis = firstAxis == X ? Z : X;
+		second.axis = firstAxis == X ? Y : X;
 	}
 	second.inverted = invertedSecondAxis;
 	axis.secondAxis = second;
@@ -54,38 +54,38 @@ Axis getAxisForModeAndCut(char mode, char cut, int start) {
 
 int getVoxelX(Image *img, Axis axis, int row, int col) {
 	if (axis.fixedAxis.axis == X) {
-		return axis.fixedAxis.inverted ? img->xsize - axis.start : axis.start;
+		return axis.fixedAxis.inverted ? img->xsize - axis.start - 1 : axis.start;
 	}
 
 	if (axis.firstAxis.axis == X) {
-		return axis.firstAxis.inverted ? img->xsize - col : col;
+		return axis.firstAxis.inverted ? img->xsize - col - 1 : col;
 	}
 
-	return axis.secondAxis.inverted ? img->xsize - row : row;
+	return axis.secondAxis.inverted ? img->xsize - row - 1 : row;
 }
 
 int getVoxelY(Image *img, Axis axis, int row, int col) {
 	if (axis.fixedAxis.axis == Y) {
-		return axis.fixedAxis.inverted ? img->ysize - axis.start : axis.start;
+		return axis.fixedAxis.inverted ? img->ysize - axis.start - 1 : axis.start;
 	}
 
 	if (axis.firstAxis.axis == Y) {
-		return axis.firstAxis.inverted ? img->ysize - col : col;
+		return axis.firstAxis.inverted ? img->ysize - col - 1 : col;
 	}
 
-	return axis.secondAxis.inverted ? img->ysize - row : row;
+	return axis.secondAxis.inverted ? img->ysize - row - 1 : row;
 }
 
 int getVoxelZ(Image *img, Axis axis, int row, int col) {
 	if (axis.fixedAxis.axis == Z) {
-		return axis.fixedAxis.inverted ? img->zsize - axis.start : axis.start;
+		return axis.fixedAxis.inverted ? img->zsize - axis.start - 1 : axis.start;
 	}
 
 	if (axis.firstAxis.axis == Z) {
-		return axis.firstAxis.inverted ? img->zsize - col : col;
+		return axis.firstAxis.inverted ? img->zsize - col - 1 : col;
 	}
 
-	return axis.secondAxis.inverted ? img->zsize - row : row;
+	return axis.secondAxis.inverted ? img->zsize - row - 1 : row;
 }
 
 Voxel getVoxel(Image *img, Axis axis, int row, int col) {

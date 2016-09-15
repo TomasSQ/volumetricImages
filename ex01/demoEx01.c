@@ -37,17 +37,17 @@ int main(int argc, char *argv[]) {
 
 	printf("Image size: %d x %d x %d\n", img->xsize, img->ysize, img->zsize);
 
-	for (i = 1; i < img->zsize; i++) {
+	for (i = 0; i < img->zsize; i++) {
 		test(img, RADIOLOGIST, AXIAL, i, argv[2]);
 		test(img, NEUROSURGEON, AXIAL, i, argv[2]);
 	}
 
-	for (i = 1; i < img->xsize; i++) {
+	for (i = 0; i < img->xsize; i++) {
 		test(img, RADIOLOGIST, SAGITTAL, i, argv[2]);
 		test(img, NEUROSURGEON, SAGITTAL, i, argv[2]);
 	}
 
-	for (i = 1; i < img->ysize; i++) {
+	for (i = 0; i < img->ysize; i++) {
 		test(img, RADIOLOGIST, CORONAL, i, argv[2]);
 		test(img, NEUROSURGEON, CORONAL, i, argv[2]);
 	}
