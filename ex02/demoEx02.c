@@ -39,7 +39,6 @@ int main(int argc, char *argv[]) {
 	for (i = 0; i < img->zsize; i++) {
 		cut = getCutFromImage(img, getAxisForModeAndCut(RADIOLOGIST, CORONAL, i), argv[2]);
 		if (label != NULL) {
-			printf("Coloring using label\n");
 			cutLabel = getCutFromImage(label, getAxisForModeAndCut(RADIOLOGIST, CORONAL, i), argv[2]);
 		}
 
@@ -51,11 +50,16 @@ int main(int argc, char *argv[]) {
 		} else {
 			cutColored = coloredLabelImage2D(cut, cutLabel);
 		}
+
 		sprintf(outputFileName, "out/afterColored_%04d", i);
 		saveColoredImage(outputFileName, cutColored->r, cutColored->g, cutColored->b, cutColored->width, cutColored->height);
 
 		freeImage2D(cut);
 		freeColoredImage2D(cutColored);
+
+		if (cutLabel != NULL) {
+			freeImage2D(cutLabel);
+		}
 	}
 
 	t2 = Toc();
@@ -63,6 +67,9 @@ int main(int argc, char *argv[]) {
 
 	DestroyImage(img);
 
+	if (label != NULL) {
+		DestroyImage(label);
+	}
 	/* ------------------------------------------------------ */
 
 	info = mallinfo();
