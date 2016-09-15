@@ -1,36 +1,9 @@
 #include <limits.h>
 
+#include "../myLib/myCommon.h"
 #include "bitmap.h"
 
-typedef struct {
-	int min;
-	int max;
-} range;
-
 void writeImage(char* imageName, unsigned char *img, int imageWidth, int imageHeight);
-
-range getRange(int **img, int imageWidth, int imageHeight) {
-	int	row, col;
-
-	range r;
-	r.max = INT_MIN;
-	r.min = INT_MAX;
-	for (row = 0; row < imageHeight; row++) {
-		for (col = 0; col < imageWidth; col++) {
-			if (img[row][col] < 0 || img[row][col] > (1<<16)) {
-				img[row][col] = 0;
-			}
-			if (img[row][col] > r.max) {
-				r.max = img[row][col];
-			}
-			if (img[row][col] < r.min) {
-				r.min = img[row][col];
-			}
-		}
-	}
-
-	return r;
-}
 
 void saveImage(char* imageName, int **img, int imageWidth, int imageHeight) {
 	FILE *fp = NULL;
@@ -44,7 +17,7 @@ void saveImage(char* imageName, int **img, int imageWidth, int imageHeight) {
 	if (r.max - r.min >= 0 && r.max - r.min < 256) {
 		fprintf(fp,"P5\n");
 		fprintf(fp,"%d %d\n", imageWidth, imageHeight);
-		fprintf(fp,"%d\n", r.max - r.min);
+		fprintf(fp,"%d\n", 255);
 
 		data = (unsigned char*) malloc(sizeof(unsigned char) * imageWidth * imageHeight);
 		for (row = 0; row < imageHeight; row++) {

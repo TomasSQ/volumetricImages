@@ -3,13 +3,13 @@ MO815-3DVIS-LIB = -L../libmo815-3dvis/lib -lmo815-3dvis -lm
 MO815-3DVIS-FLAGS = -I../libmo815-3dvis/include
 
 all:
-	gcc $(FLAGS) demoEx02.c ex02.c ../ex01/ex01.c ../ex01/bitmap.c -o ex02.o $(MO815-3DVIS-FLAGS) $(MO815-3DVIS-LIB) ;
+	gcc $(FLAGS) demoEx02.c ex02.c ../ex01/ex01.c ../ex01/bitmap.c ../myLib/*.c -o ex02.o $(MO815-3DVIS-FLAGS) $(MO815-3DVIS-LIB) ;
 
 clean:
 	rm -rf ex02.o out
 
 run:
-	mkdir -p out && rm -f out/afterColored_0* && clear && make && ./ex02.o ../libmo815-3dvis/data/brain.scn 60 60
+	mkdir -p out && rm -f out/afterColored_0* && clear && make && ./ex02.o ../libmo815-3dvis/data/skull.scn 80 20
 
 gif:
 	convert -delay 0 -loop 0 out/afterColored_*.pgm ~/Desktop/afterColored.gif

@@ -1,7 +1,5 @@
 #include "ex02.h"
 
-#define ABS(x) ((x >= 0)?x:-x)
-
 float linearTransform(float I, float k1, float k2, float I1, float I2) {
 	if (I < I1) {
 		return k1;
@@ -14,7 +12,7 @@ float linearTransform(float I, float k1, float k2, float I1, float I2) {
 }
 
 void ajustWindowAndLevel(float window, float level, int** img, int imageWidth, int imageHeight) {
-	float H = 255.0; /*Mudar para 2^b - 1, com b sendo numero de bits para cada canal de cores*/
+	float H = getRange(img, imageWidth, imageHeight).max;
 	float k2 = H;
 	float k1 = 0.0;
 	float I1, I2, aux;
@@ -39,14 +37,14 @@ void ajustWindowAndLevel(float window, float level, int** img, int imageWidth, i
 }
 
 Image2D coloredImage2D(Image2D img) {
-	float H = 4095;
+	float H = getRange(img->img, img->width, img->height).max;
 	float V;
 	int row, col;
 	Image2D colored = newColoredImage2D(img->width, img->height);
 
 	for (row = 0; row < colored->height; row ++) {
 		for (col = 0; col < colored->width; col ++) {
-			if (col % 3 != 0 || row % 3 != 0) {
+			if ((col + row) % 2 != 0) {
 				colored->r[row][col] = img->img[row][col];
 				colored->g[row][col] = img->img[row][col];
 				colored->b[row][col] = img->img[row][col];
