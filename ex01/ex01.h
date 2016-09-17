@@ -1,4 +1,3 @@
-#include "mo815-3dvis.h"
 #include "../myLib/myCommon.h"
 
 #define RADIOLOGIST 'R'

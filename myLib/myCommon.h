@@ -1,6 +1,8 @@
 #ifndef MY_COMMON
 #define MY_COMMON
 
+#include "mo815-3dvis.h"
+
 #define ABS(x) ((x >= 0)?x:-x)
 
 typedef enum {
