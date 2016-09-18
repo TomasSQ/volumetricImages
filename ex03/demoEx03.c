@@ -30,6 +30,69 @@ void drawStar() {
 		drawLine(image, createPoint3D(image->width - i * step, image->height, 0), createPoint3D(image->width, max * step + i * 10, 0), 255);
 
 	saveImage("out/star", image->img, image->width, image->height);
+	freeImage2D(image);
+}
+
+void drawSquare(Image2D image, Vertex a, Vertex b, Vertex c, Vertex d) {
+	printf("%f\t%f\n", a.x, a.y);
+	printf("%f\t%f\n", b.x, b.y);
+	printf("%f\t%f\n", c.x, c.y);
+	printf("%f\t%f\n", d.x, d.y);
+	drawLine(image, a, b, 255);
+	drawLine(image, b, c, 255);
+	drawLine(image, c, d, 255);
+	drawLine(image, d, a, 255);
+}
+
+void drawFace(Image2D image, Vertices vertices, int face, Vector3D planeRotation) {
+	Point3D origin = createPoint3D(25, 25, 25);
+	switch (face) {
+		case 0:
+			drawSquare(image, rotateY(rotateX(vertices[0], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[1], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[2], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[3], origin, planeRotation.x, false), origin, planeRotation.y, false));
+			break;
+		case 1:
+			drawSquare(image, rotateY(rotateX(vertices[4], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[5], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[6], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[7], origin, planeRotation.x, false), origin, planeRotation.y, false));
+			break;
+		case 2:
+			drawSquare(image, rotateY(rotateX(vertices[0], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[4], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[7], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[3], origin, planeRotation.x, false), origin, planeRotation.y, false));
+			break;
+		case 3:
+			drawSquare(image, rotateY(rotateX(vertices[1], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[5], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[6], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[2], origin, planeRotation.x, false), origin, planeRotation.y, false));
+			break;
+		case 4:
+			drawSquare(image, rotateY(rotateX(vertices[0], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[1], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[5], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[4], origin, planeRotation.x, false), origin, planeRotation.y, false));
+			break;
+		case 5:
+			drawSquare(image, rotateY(rotateX(vertices[2], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[3], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[7], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[6], origin, planeRotation.x, false), origin, planeRotation.y, false));
+			break;
+	}
+}
+
+void testVisibleFaces(char* name, Vector3D planeRotation, Vector3D* normals, Vertices vertices) {
+	int i;
+	bool* visible = (bool*) malloc(sizeof(bool) * 6);
+	visibleFaces(planeRotation, normals, visible, 6);
+
+	Image2D image = newImage2D(500, 500);
+	for (i = 0; i < 6; i++) {
+		printf("%d\t", visible[i]);
+	}
+	printf("\n");
+	for (i = 0; i < 6; i++) {
+		if (visible[i]) {
+			printf("%d\n", i);
+			drawFace(image, vertices, i, planeRotation);
+		}
+	}
+
+	saveImage(name, image->img, image->width, image->height);
+	freeImage2D(image);
+	free(visible);
+}
+
+void drawCube(Vector3D* normals, Vertices vertices) {
+	testVisibleFaces("out/cube_1", createVector3D(0, 0, 0), normals, vertices);
+	testVisibleFaces("out/cube_2", createVector3D(PI / 4.0, -PI / 4.0, 0), normals, vertices);
 }
 
 int main(int argc, char* argv[]) {
@@ -46,17 +109,17 @@ int main(int argc, char* argv[]) {
 
 	Vertices vertices = (Vertices) malloc(sizeof(Vertex) * 8);
 	vertices[0] = createVertex( 0,  0,  0);
-	vertices[1] = createVertex( 1,  0,  0);
-	vertices[2] = createVertex( 1,  1,  0);
-	vertices[3] = createVertex( 0,  1,  0);
-	vertices[4] = createVertex( 0,  0,  1);
-	vertices[5] = createVertex( 1,  0,  1);
-	vertices[6] = createVertex( 1,  1,  1);
-	vertices[7] = createVertex( 0,  1,  1);
+	vertices[1] = createVertex( 50,  0,  0);
+	vertices[2] = createVertex( 50,  50,  0);
+	vertices[3] = createVertex( 0,  50,  0);
+	vertices[4] = createVertex( 0,  0,  50);
+	vertices[5] = createVertex( 50,  0,  50);
+	vertices[6] = createVertex( 50,  50,  50);
+	vertices[7] = createVertex( 0,  50,  50);
 
-	Face* cube = createCube(normals, vertices);
+	//drawStar();
 
-	drawStar();
+	drawCube(normals, vertices);
 
 	return 0;
 }

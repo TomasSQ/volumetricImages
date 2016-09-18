@@ -34,4 +34,12 @@ Face createFace(Vector3D normal, Vertices vertices);
 
 Face* createCube(Vector3D* normals, Vertices vertices);
 
+Point3D translate(Point3D p, Vector3D inc, bool inverse);
+Point3D scale(Point3D p, Vector3D factor, bool inverse);
+Point3D rotateZ(Point3D p, Point3D origin, float theta, bool inverse);
+Point3D rotateY(Point3D p, Point3D origin, float theta, bool inverse);
+Point3D rotateX(Point3D p, Point3D origin, float theta, bool inverse);
+
+float innerProduct(Vector3D a, Vector3D b);
+
 #endif

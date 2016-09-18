@@ -2,6 +2,63 @@
 
 #include "math3D.h"
 
+float innerProduct(Vector3D a, Vector3D b) {
+	return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+Point3D translate(Point3D p, Vector3D inc, bool inverse) {
+	Point3D q;
+
+	q.x = p.x + (inverse ? -1.0 : 1.0) * inc.x;
+	q.y = p.y + (inverse ? -1.0 : 1.0) * inc.y;
+	q.z = p.z + (inverse ? -1.0 : 1.0) * inc.z;
+
+	return q;
+}
+
+Point3D scale(Point3D p, Vector3D factor, bool inverse) {
+	Point3D q;
+
+	q.x = p.x * (inverse ? 1.0 / factor.x : factor.x);
+	q.y = p.y * (inverse ? 1.0 / factor.y : factor.y);
+	q.z = p.z * (inverse ? 1.0 / factor.z : factor.z);
+
+	return q;
+}
+
+Point3D rotateZ(Point3D p, Point3D origin, float theta, bool inverse) {
+	theta = inverse ? -theta : theta;
+	Point3D q = translate(p, origin, true);
+
+	q.x = q.x * cos(theta) - q.y * sin(theta);
+	q.y = q.x * sin(theta) + q.y * cos(theta);
+	q.z = q.z;
+
+	return translate(q, origin, false);
+}
+
+Point3D rotateY(Point3D p, Point3D origin, float theta, bool inverse) {
+	theta = inverse ? -theta : theta;
+	Point3D q = translate(p, origin, true);
+
+	q.x = q.x * cos(theta) + q.z * sin(theta);
+	q.y = q.y;
+	q.z = - q.x * sin(theta) + q.z * cos(theta);
+
+	return translate(q, origin, false);
+}
+
+Point3D rotateX(Point3D p, Point3D origin, float theta, bool inverse) {
+	theta = inverse ? -theta : theta;
+	Point3D q = translate(p, origin, true);
+
+	q.x = q.x;
+	q.y = q.y * cos(theta) - q.z * sin(theta);
+	q.z = q.y * sin(theta) + q.z * cos(theta);
+
+	return translate(q, origin, false);
+}
+
 bool samePoint(Point3D a, Point3D b) {
 	return a.x == b.x && a.y == b.y && a.z == b.z;
 }

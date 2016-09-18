@@ -2,6 +2,20 @@
 
 #include "ex03.h"
 
+void visibleFaces(Vector3D planeRotation, Vector3D* normals, bool* visibleFaces, int nFaces) {
+	int i = 0;
+
+	Point3D origin = createPoint3D(0, 0, 0);
+	Vector3D normal = createVector3D(0, 0, -1);
+
+	normal = rotateX(normal, origin, planeRotation.x, false);
+	normal = rotateY(normal, origin, planeRotation.y, false);
+
+	for (i = 0; i < nFaces; i++) {
+		visibleFaces[i] = innerProduct(normal, normals[i]) > 0;
+	}
+}
+
 void draw(Image2D image, Point3D p, float dx, float dy, int n, int intensity) {
 	int i;
 	for (i = 0; i < n; i++) {

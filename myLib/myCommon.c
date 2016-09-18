@@ -27,7 +27,7 @@ range getRange(int **img, int imageWidth, int imageHeight) {
 }
 
 Image2D newImage2D(int width, int height) {
-	int row;
+	int row, col;
 	Image2D img = (Image2D) malloc(sizeof(_image2D));
 	img->img = (int**) malloc(sizeof(int*) * height);
 	img->width = width;
@@ -35,6 +35,9 @@ Image2D newImage2D(int width, int height) {
 
 	for (row = 0; row < img->height; row++) {
 		img->img[row] = (int*) malloc(sizeof(int) * img->width);
+		for (col = 0; col < img->width; col++) {
+			img->img[row][col] = 0;
+		}
 	}
 
 	return img;
