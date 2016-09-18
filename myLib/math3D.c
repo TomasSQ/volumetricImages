@@ -2,6 +2,17 @@
 
 #include "math3D.h"
 
+
+Point3D project(Vector3D planeRotation, Point3D p, int D) {
+	Point3D p2 = rotateX(p, createPoint3D(D, D, D), planeRotation.x, false);
+	p2 = rotateY(p2, createPoint3D(D, D, D), planeRotation.y, false);
+	p2.x += D;
+	p2.y += D;
+	p2.z = 0;
+
+	return p2;
+}
+
 float innerProduct(Vector3D a, Vector3D b) {
 	return a.x * b.x + a.y * b.y + a.z * b.z;
 }

@@ -34,10 +34,10 @@ void drawStar() {
 }
 
 void drawSquare(Image2D image, Vertex a, Vertex b, Vertex c, Vertex d) {
-	printf("%f\t%f\n", a.x, a.y);
-	printf("%f\t%f\n", b.x, b.y);
-	printf("%f\t%f\n", c.x, c.y);
-	printf("%f\t%f\n", d.x, d.y);
+	// printf("%f\t%f\n", a.x, a.y);
+	// printf("%f\t%f\n", b.x, b.y);
+	// printf("%f\t%f\n", c.x, c.y);
+	// printf("%f\t%f\n", d.x, d.y);
 	drawLine(image, a, b, 255);
 	drawLine(image, b, c, 255);
 	drawLine(image, c, d, 255);
@@ -45,25 +45,25 @@ void drawSquare(Image2D image, Vertex a, Vertex b, Vertex c, Vertex d) {
 }
 
 void drawFace(Image2D image, Vertices vertices, int face, Vector3D planeRotation) {
-	Point3D origin = createPoint3D(25, 25, 25);
+	Point3D origin = createPoint3D(100, 100, 100);
 	switch (face) {
 		case 0:
-			drawSquare(image, rotateY(rotateX(vertices[0], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[1], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[2], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[3], origin, planeRotation.x, false), origin, planeRotation.y, false));
+			drawSquare(image, project(planeRotation, vertices[0], 100), project(planeRotation, vertices[1], 100), project(planeRotation, vertices[2], 100), project(planeRotation, vertices[3], 100));
 			break;
 		case 1:
-			drawSquare(image, rotateY(rotateX(vertices[4], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[5], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[6], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[7], origin, planeRotation.x, false), origin, planeRotation.y, false));
+			drawSquare(image, project(planeRotation, vertices[4], 100), project(planeRotation, vertices[5], 100), project(planeRotation, vertices[6], 100), project(planeRotation, vertices[7], 100));
 			break;
 		case 2:
-			drawSquare(image, rotateY(rotateX(vertices[0], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[4], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[7], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[3], origin, planeRotation.x, false), origin, planeRotation.y, false));
+			drawSquare(image, project(planeRotation, vertices[0], 100), project(planeRotation, vertices[4], 100), project(planeRotation, vertices[7], 100), project(planeRotation, vertices[3], 100));
 			break;
 		case 3:
-			drawSquare(image, rotateY(rotateX(vertices[1], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[5], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[6], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[2], origin, planeRotation.x, false), origin, planeRotation.y, false));
+			drawSquare(image, project(planeRotation, vertices[1], 100), project(planeRotation, vertices[5], 100), project(planeRotation, vertices[6], 100), project(planeRotation, vertices[2], 100));
 			break;
 		case 4:
-			drawSquare(image, rotateY(rotateX(vertices[0], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[1], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[5], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[4], origin, planeRotation.x, false), origin, planeRotation.y, false));
+			drawSquare(image, project(planeRotation, vertices[0], 100), project(planeRotation, vertices[1], 100), project(planeRotation, vertices[5], 100), project(planeRotation, vertices[4], 100));
 			break;
 		case 5:
-			drawSquare(image, rotateY(rotateX(vertices[2], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[3], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[7], origin, planeRotation.x, false), origin, planeRotation.y, false), rotateY(rotateX(vertices[6], origin, planeRotation.x, false), origin, planeRotation.y, false));
+			drawSquare(image, project(planeRotation, vertices[2], 100), project(planeRotation, vertices[3], 100), project(planeRotation, vertices[7], 100), project(planeRotation, vertices[6], 100));
 			break;
 	}
 }
@@ -80,7 +80,7 @@ void testVisibleFaces(char* name, Vector3D planeRotation, Vector3D* normals, Ver
 	printf("\n");
 	for (i = 0; i < 6; i++) {
 		if (visible[i]) {
-			printf("%d\n", i);
+			// printf("%d\n", i);
 			drawFace(image, vertices, i, planeRotation);
 		}
 	}
@@ -91,8 +91,12 @@ void testVisibleFaces(char* name, Vector3D planeRotation, Vector3D* normals, Ver
 }
 
 void drawCube(Vector3D* normals, Vertices vertices) {
-	testVisibleFaces("out/cube_1", createVector3D(0, 0, 0), normals, vertices);
-	testVisibleFaces("out/cube_2", createVector3D(PI / 4.0, -PI / 4.0, 0), normals, vertices);
+	char nome[200];
+	float i;
+	for (i = 0; i < 2 * PI; i += 0.1) {
+		sprintf(nome, "out/cube_%f", i);
+		testVisibleFaces(nome, createVector3D(i, i, 0), normals, vertices);
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -101,21 +105,21 @@ int main(int argc, char* argv[]) {
 	normals[1] = createVector3D( 0,  0,  1);
 	normals[2] = createVector3D(-1,  0,  0);
 	normals[3] = createVector3D( 1,  0,  0);
-	normals[4] = createVector3D( 0, -1,  0);
-	normals[5] = createVector3D( 0,  1,  0);
+	normals[4] = createVector3D( 0,  1,  0);
+	normals[5] = createVector3D( 0, -1,  0);
 
 	printf("samePoint: 1 == %d\n", samePoint(normals[0], normals[0]));
 	printf("samePoint: 0 == %d\n", samePoint(normals[1], normals[0]));
 
 	Vertices vertices = (Vertices) malloc(sizeof(Vertex) * 8);
-	vertices[0] = createVertex( 0,  0,  0);
-	vertices[1] = createVertex( 50,  0,  0);
-	vertices[2] = createVertex( 50,  50,  0);
-	vertices[3] = createVertex( 0,  50,  0);
-	vertices[4] = createVertex( 0,  0,  50);
-	vertices[5] = createVertex( 50,  0,  50);
-	vertices[6] = createVertex( 50,  50,  50);
-	vertices[7] = createVertex( 0,  50,  50);
+	vertices[0] = createVertex( 50,  50,  50);
+	vertices[1] = createVertex(150,  50,  50);
+	vertices[2] = createVertex(150, 150,  50);
+	vertices[3] = createVertex( 50, 150,  50);
+	vertices[4] = createVertex( 50,  50, 150);
+	vertices[5] = createVertex(150,  50, 150);
+	vertices[6] = createVertex(150, 150, 150);
+	vertices[7] = createVertex( 50, 150, 150);
 
 	//drawStar();
 

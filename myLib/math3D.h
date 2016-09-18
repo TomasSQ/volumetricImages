@@ -41,5 +41,5 @@ Point3D rotateY(Point3D p, Point3D origin, float theta, bool inverse);
 Point3D rotateX(Point3D p, Point3D origin, float theta, bool inverse);
 
 float innerProduct(Vector3D a, Vector3D b);
-
+Point3D project(Vector3D planeRotation, Point3D p, int D);
 #endif
