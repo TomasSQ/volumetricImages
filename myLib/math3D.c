@@ -2,12 +2,11 @@
 
 #include "math3D.h"
 
-
 Point3D project(Vector3D planeRotation, Point3D p, int D) {
 	Point3D p2 = rotateX(p, createPoint3D(D, D, D), planeRotation.x, false);
 	p2 = rotateY(p2, createPoint3D(D, D, D), planeRotation.y, false);
-	p2.x += D;
-	p2.y += D;
+	p2.x += 0;
+	p2.y += 0;
 	p2.z = 0;
 
 	return p2;
@@ -41,33 +40,36 @@ Point3D rotateZ(Point3D p, Point3D origin, float theta, bool inverse) {
 	theta = inverse ? -theta : theta;
 	Point3D q = translate(p, origin, true);
 
-	q.x = q.x * cos(theta) - q.y * sin(theta);
-	q.y = q.x * sin(theta) + q.y * cos(theta);
-	q.z = q.z;
+	Point3D q2;
+	q2.x = q.x * COS(theta) + q.y * SIN(theta);
+	q2.y = -q.x * SIN(theta) + q.y * COS(theta);
+	q2.z = q.z;
 
-	return translate(q, origin, false);
+	return translate(q2, origin, false);
 }
 
 Point3D rotateY(Point3D p, Point3D origin, float theta, bool inverse) {
 	theta = inverse ? -theta : theta;
 	Point3D q = translate(p, origin, true);
 
-	q.x = q.x * cos(theta) + q.z * sin(theta);
-	q.y = q.y;
-	q.z = - q.x * sin(theta) + q.z * cos(theta);
+	Point3D q2;
+	q2.x = q.x * COS(theta) + q.z * SIN(theta);
+	q2.y = q.y;
+	q2.z = - q.x * SIN(theta) + q.z * COS(theta);
 
-	return translate(q, origin, false);
+	return translate(q2, origin, false);
 }
 
 Point3D rotateX(Point3D p, Point3D origin, float theta, bool inverse) {
 	theta = inverse ? -theta : theta;
 	Point3D q = translate(p, origin, true);
 
-	q.x = q.x;
-	q.y = q.y * cos(theta) - q.z * sin(theta);
-	q.z = q.y * sin(theta) + q.z * cos(theta);
+	Point3D q2;
+	q2.x = q.x;
+	q2.y = q.y * COS(theta) - q.z * SIN(theta);
+	q2.z = q.y * SIN(theta) + q.z * COS(theta);
 
-	return translate(q, origin, false);
+	return translate(q2, origin, false);
 }
 
 bool samePoint(Point3D a, Point3D b) {

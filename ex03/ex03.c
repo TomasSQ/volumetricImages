@@ -8,11 +8,13 @@ void visibleFaces(Vector3D planeRotation, Vector3D* normals, bool* visibleFaces,
 	Point3D origin = createPoint3D(0, 0, 0);
 	Vector3D normal = createVector3D(0, 0, -1);
 
-	normal = rotateX(normal, origin, planeRotation.x, false);
-	normal = rotateY(normal, origin, planeRotation.y, false);
-
 	for (i = 0; i < nFaces; i++) {
-		visibleFaces[i] = innerProduct(normal, normals[i]) > 0;
+		Vector3D normal2;
+
+		normal2 = rotateX(normals[i], origin, planeRotation.x, false);
+		normal2 = rotateY(normal2, origin, planeRotation.y, false);
+
+		visibleFaces[i] = innerProduct(normal, normal2) > 0;
 	}
 }
 

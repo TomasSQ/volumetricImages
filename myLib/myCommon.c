@@ -3,6 +3,25 @@
 
 #include "myCommon.h"
 
+#define EPS 0.0001
+
+float SIN(float theta) {
+	float r = sin(theta);
+	if (-EPS < r && r < EPS) {
+		return 0;
+	}
+
+	return r;
+}
+float COS(float theta) {
+	float r = cos(theta);
+	if (-EPS < r && r < EPS) {
+		return 0;
+	}
+
+	return r;
+}
+
 range getRange(int **img, int imageWidth, int imageHeight) {
 	int	row, col;
 

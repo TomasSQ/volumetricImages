@@ -32,4 +32,7 @@ void freeColoredImage2D(Image2D img);
 
 range getRange(int **img, int imageWidth, int imageHeight);
 
+float SIN(float theta);
+float COS(float theta);
+
 #endif
