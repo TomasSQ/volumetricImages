@@ -34,10 +34,6 @@ void drawStar() {
 }
 
 void drawSquare(Image2D image, Vertex a, Vertex b, Vertex c, Vertex d) {
-	// printf("%f\t%f\n", a.x, a.y);
-	// printf("%f\t%f\n", b.x, b.y);
-	// printf("%f\t%f\n", c.x, c.y);
-	// printf("%f\t%f\n", d.x, d.y);
 	drawLine(image, a, b, 255);
 	drawLine(image, b, c, 255);
 	drawLine(image, c, d, 255);
@@ -87,7 +83,7 @@ void testVisibleFaces(char* name, Vector3D planeRotation, Vector3D* normals, Ver
 
 void drawCube(Vector3D* normals, Vertices vertices) {
 	char nome[200];
-	float i;
+	float i = 0;
 	for (i = 0; i < 2 * PI; i += 0.1) {
 		sprintf(nome, "out/cube_%f", i);
 		testVisibleFaces(nome, createVector3D(i, i, 0), normals, vertices);
@@ -119,6 +115,11 @@ int main(int argc, char* argv[]) {
 	//drawStar();
 
 	drawCube(normals, vertices);
+
+	Cube cube = createCube(createPoint3D(250, 250, 250), 100);
+	printf("%f\t%f\t%f\n", cube->vertices[0]->x, cube->edges[0]->a->x, cube->faces[0]->vertices[0]->x);
+	cube->vertices[0]->x = 50;
+	printf("%f\t%f\t%f\n", cube->vertices[0]->x, cube->edges[0]->a->x, cube->faces[0]->vertices[0]->x);
 
 	return 0;
 }

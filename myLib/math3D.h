@@ -7,14 +7,20 @@ typedef struct {
 	float x;
 	float y;
 	float z;
-} Point3D, Vertex, Vector3D;
+} _point3D;
+
+typedef _point3D* Point3D;
+typedef _point3D* Vertex;
+typedef _point3D* Vector3D;
 
 typedef Vertex* Vertices;
 
 typedef struct {
 	Vertex a;
 	Vertex b;
-} Edge;
+} _edge;
+
+typedef _edge* Edge;
 
 typedef struct {
 	Vector3D normal;
@@ -30,9 +36,7 @@ bool samePoint(Point3D a, Point3D b);
 
 Edge createEdge(Vertex a, Vertex b);
 
-Face createFace(Vector3D normal, Vertices vertices);
-
-Face* createCube(Vector3D* normals, Vertices vertices);
+Face createFace(Vertices vertices);
 
 Point3D translate(Point3D p, Vector3D inc, bool inverse);
 Point3D scale(Point3D p, Vector3D factor, bool inverse);
@@ -41,5 +45,10 @@ Point3D rotateY(Point3D p, Point3D origin, float theta, bool inverse);
 Point3D rotateX(Point3D p, Point3D origin, float theta, bool inverse);
 
 float innerProduct(Vector3D a, Vector3D b);
+float moduleOfVector3D(Vector3D a);
+Vector3D vectorProduct(Vector3D a, Vector3D b);
+Vector3D normalizedVector3D(Vector3D a);
+Vector3D calculateNormal(Vertices vertices, int vCount);
 Point3D project(Vector3D planeRotation, Point3D p, int D);
+
 #endif
