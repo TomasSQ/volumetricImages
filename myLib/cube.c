@@ -83,7 +83,7 @@ Cube createCube(Point3D origin, float size) {
 	return cube;
 }
 
-void destroCube(Cube cube) {
+void destroyCube(Cube cube) {
 	free(cube->vertices);
 	free(cube->edges);
 	free(cube->faces);

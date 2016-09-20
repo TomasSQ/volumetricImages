@@ -1,4 +1,4 @@
-#include "../ex01/bitmap.h"
+#include "../myLib/bitmap.h"
 
 #include "ex02.h"
 

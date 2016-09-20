@@ -16,6 +16,9 @@ typedef _cube* Cube;
 
 
 Cube createCube(Point3D origin, float size);
-void destroCube(Cube cube);
+
+void recalculateNormals(Cube cube);
+
+void destroyCube(Cube cube);
 
 #endif

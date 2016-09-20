@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "../ex01/bitmap.h"
+#include "../myLib/bitmap.h"
 
 #include "ex03.h"
 
@@ -64,15 +64,24 @@ void drawFace(Image2D image, Vertices vertices, int face, Vector3D planeRotation
 	}
 }
 
-void testVisibleFaces(char* name, Vector3D planeRotation, Vector3D* normals, Vertices vertices) {
+void testCube(char* name, Vector3D planeRotation) {
 	int i;
 	bool* visible = (bool*) malloc(sizeof(bool) * 6);
-	visibleFaces(planeRotation, normals, visible, 6);
+	Point3D origin = createPoint3D(250, 250, 250);
+	Cube cube = createCube(origin, 100);
+
+	for (i = 0; i < cube->nVertices; i++) {
+		cube->vertices[i] = rotateX(cube->vertices[i], origin, planeRotation->x, false);
+		cube->vertices[i] = rotateY(cube->vertices[i], origin, planeRotation->y, false);
+	}
+	recalculateNormals(cube);
+
+	visibleFaces(planeRotation, cube->faces, visible, 6);
 
 	Image2D image = newImage2D(500, 500);
 	for (i = 0; i < 6; i++) {
 		if (visible[i]) {
-			drawFace(image, vertices, i, planeRotation);
+			drawFace(image, cube->vertices, i, planeRotation);
 		}
 	}
 
@@ -81,45 +90,19 @@ void testVisibleFaces(char* name, Vector3D planeRotation, Vector3D* normals, Ver
 	free(visible);
 }
 
-void drawCube(Vector3D* normals, Vertices vertices) {
+void drawCube() {
 	char nome[200];
 	float i = 0;
 	for (i = 0; i < 2 * PI; i += 0.1) {
 		sprintf(nome, "out/cube_%f", i);
-		testVisibleFaces(nome, createVector3D(i, i, 0), normals, vertices);
+		testCube(nome, createVector3D(i, i, 0));
 	}
 }
 
 int main(int argc, char* argv[]) {
-	Vector3D* normals = (Vector3D*) malloc(sizeof(Vector3D) * 6);
-	normals[0] = createVector3D( 0,  0, -1); // 0 1 2 3
-	normals[1] = createVector3D( 0,  0,  1); // 4 5 6 7
-	normals[2] = createVector3D(-1,  0,  0); // 0 4 7 3
-	normals[3] = createVector3D( 1,  0,  0); // 1 5 6 2
-	normals[4] = createVector3D( 0, -1,  0); // 0 4 5 1
-	normals[5] = createVector3D( 0,  1,  0); // 3 7 6 2
-
-	printf("samePoint: 1 == %d\n", samePoint(normals[0], normals[0]));
-	printf("samePoint: 0 == %d\n", samePoint(normals[1], normals[0]));
-
-	Vertices vertices = (Vertices) malloc(sizeof(Vertex) * 8);
-	vertices[0] = createVertex(150, 150, 150);
-	vertices[1] = createVertex(350, 150, 150);
-	vertices[2] = createVertex(350, 350, 150);
-	vertices[3] = createVertex(150, 350, 150);
-	vertices[4] = createVertex(150, 150, 350);
-	vertices[5] = createVertex(350, 150, 350);
-	vertices[6] = createVertex(350, 350, 350);
-	vertices[7] = createVertex(150, 350, 350);
-
 	//drawStar();
 
-	drawCube(normals, vertices);
-
-	Cube cube = createCube(createPoint3D(250, 250, 250), 100);
-	printf("%f\t%f\t%f\n", cube->vertices[0]->x, cube->edges[0]->a->x, cube->faces[0]->vertices[0]->x);
-	cube->vertices[0]->x = 50;
-	printf("%f\t%f\t%f\n", cube->vertices[0]->x, cube->edges[0]->a->x, cube->faces[0]->vertices[0]->x);
+	drawCube();
 
 	return 0;
 }

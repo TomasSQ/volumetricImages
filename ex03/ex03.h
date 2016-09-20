@@ -7,6 +7,6 @@
 
 void drawLine(Image2D image, Point3D start, Point3D end, int intensity);
 
-void visibleFaces(Vector3D planeRotation, Vector3D* normals, bool* visibleFaces, int nFaces);
+void visibleFaces(Vector3D planeRotation, Face* faces, bool* visibleFaces, int nFaces);
 
 #endif

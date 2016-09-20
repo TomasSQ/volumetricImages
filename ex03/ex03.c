@@ -2,19 +2,13 @@
 
 #include "ex03.h"
 
-void visibleFaces(Vector3D planeRotation, Vector3D* normals, bool* visibleFaces, int nFaces) {
+void visibleFaces(Vector3D planeRotation, Face* faces, bool* visibleFaces, int nFaces) {
 	int i = 0;
 
-	Point3D origin = createPoint3D(0, 0, 0);
 	Vector3D normal = createVector3D(0, 0, -1);
 
 	for (i = 0; i < nFaces; i++) {
-		Vector3D normal2;
-
-		normal2 = rotateX(normals[i], origin, planeRotation->x, false);
-		normal2 = rotateY(normal2, origin, planeRotation->y, false);
-
-		visibleFaces[i] = innerProduct(normal, normal2) > 0;
+		visibleFaces[i] = innerProduct(normal, faces[i]->normal) > 0;
 	}
 }
 

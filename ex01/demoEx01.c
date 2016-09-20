@@ -1,4 +1,4 @@
-#include "bitmap.h"
+#include "../myLib/bitmap.h"
 #include "ex01.h"
 
 void test(Image *img, char mode, char cut, int start, char* outputFileNamePattern) {

@@ -3,7 +3,7 @@ MO815-3DVIS-LIB = -L../libmo815-3dvis/lib -lmo815-3dvis -lm
 MO815-3DVIS-FLAGS = -I../libmo815-3dvis/include
 
 all:
-	gcc $(FLAGS) demoEx01.c ex01.c bitmap.c ../myLib/*.c -o ex01.o $(MO815-3DVIS-FLAGS) $(MO815-3DVIS-LIB) ;
+	gcc $(FLAGS) demoEx01.c ex01.c ../myLib/*.c -o ex01.o $(MO815-3DVIS-FLAGS) $(MO815-3DVIS-LIB) ;
 
 clean:
 	rm -rf ex01.o out
