@@ -2,6 +2,42 @@
 
 #include "cube.h"
 
+Cube translateCube(Cube cube, Point3D p) {
+	int i;
+
+	translate(cube->origin, p, false);
+	for (i = 0; i < cube->nVertices; i++) {
+		translate(cube->vertices[i], p, false);
+	}
+
+	return cube;
+}
+
+Cube scaleCube(Cube cube, Vector3D scaleFactor) {
+	int i;
+
+	for (i = 0; i < cube->nVertices; i++) {
+		translate(scale(translate(cube->vertices[i], cube->origin, true), scaleFactor, false), cube->origin, false);
+	}
+	scale(cube->size, scaleFactor, false);
+
+	return cube;
+}
+
+Cube rotateCube(Cube cube, Vector3D rotation) {
+	int i;
+
+	for (i = 0; i < cube->nVertices; i++) {
+		rotateX(cube->vertices[i], cube->origin, rotation->x, false);
+		rotateY(cube->vertices[i], cube->origin, rotation->y, false);
+		rotateZ(cube->vertices[i], cube->origin, rotation->z, false);
+	}
+
+	updateCube(cube);
+
+	return cube;
+}
+
 void defineVertices(Cube cube) {
 	int vertex;
 	int vertexMap[8][3] = {

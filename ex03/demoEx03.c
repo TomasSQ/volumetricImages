@@ -43,19 +43,12 @@ void drawSquare(Image2D image, Vertices vertices) {
 	drawLine(image, vertices[3], vertices[0], 255);
 }
 
-void testCube(char* name, Vector3D planeRotation) {
+void testCube(char* name, Vector3D planeRotation, Vector3D scaleFactor, Cube cube) {
 	int i;
 	bool* visible = (bool*) malloc(sizeof(bool) * 6);
-	Point3D origin = createPoint3D(250, 250, 250);
-	Cube cube = createCube(origin, createVector3D(100, 50, 25));
 
-	for (i = 0; i < cube->nVertices; i++) {
-		rotateX(cube->vertices[i], origin, planeRotation->x, false);
-		rotateY(cube->vertices[i], origin, planeRotation->y, false);
-		rotateZ(cube->vertices[i], origin, planeRotation->z, false);
-	}
-
-	updateCube(cube);
+	scaleCube(cube, scaleFactor);
+	rotateCube(cube, planeRotation);
 
 	visibleFaces(planeRotation, cube->faces, visible, 6);
 
@@ -74,9 +67,15 @@ void testCube(char* name, Vector3D planeRotation) {
 void drawCube() {
 	char nome[200];
 	float i = PI / 4;
-	for (i = 0; i < 2 * PI; i += 0.05) {
+	float inc = 0.05;
+	int sign;
+	Point3D origin = createPoint3D(250, 250, 250);
+	Cube cube = createCube(origin, createVector3D(100, 50, 25));
+
+	for (i = 0; i < 2 * PI; i += inc) {
+		sign = ((int) i) % 2 == 0 ? 1 : -1;
 		sprintf(nome, "out/cube_%f", i);
-		testCube(nome, createVector3D(-i, 3 * i, -i));
+		testCube(nome, createVector3D(-inc, 3 * inc, -inc), createVector3D(1 + sign * inc, 1 + sign * inc, 1 + sign * inc), cube);
 	}
 }
 

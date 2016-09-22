@@ -16,6 +16,9 @@ typedef struct {
 
 typedef _cube* Cube;
 
+Cube translateCube(Cube cube, Point3D p);
+Cube scaleCube(Cube cube, Vector3D scaleFactor);
+Cube rotateCube(Cube cube, Vector3D rotation);
 
 Cube createCube(Point3D origin, Vector3D size);
 
