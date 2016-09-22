@@ -33,35 +33,14 @@ void drawStar() {
 	freeImage2D(image);
 }
 
-void drawSquare(Image2D image, Vertex a, Vertex b, Vertex c, Vertex d) {
-	drawLine(image, a, b, 255);
-	drawLine(image, b, c, 255);
-	drawLine(image, c, d, 255);
-	drawLine(image, d, a, 255);
-}
+void drawSquare(Image2D image, Vertices vertices) {
+	int i;
 
-void drawFace(Image2D image, Vertices vertices, int face, Vector3D planeRotation) {
-	float center = 250;
-	switch (face) {
-		case 0:
-			drawSquare(image, project(planeRotation, vertices[0], center), project(planeRotation, vertices[1], center), project(planeRotation, vertices[2], center), project(planeRotation, vertices[3], center));
-			break;
-		case 1:
-			drawSquare(image, project(planeRotation, vertices[4], center), project(planeRotation, vertices[5], center), project(planeRotation, vertices[6], center), project(planeRotation, vertices[7], center));
-			break;
-		case 2:
-			drawSquare(image, project(planeRotation, vertices[0], center), project(planeRotation, vertices[4], center), project(planeRotation, vertices[7], center), project(planeRotation, vertices[3], center));
-			break;
-		case 3:
-			drawSquare(image, project(planeRotation, vertices[1], center), project(planeRotation, vertices[5], center), project(planeRotation, vertices[6], center), project(planeRotation, vertices[2], center));
-			break;
-		case 4:
-			drawSquare(image, project(planeRotation, vertices[0], center), project(planeRotation, vertices[1], center), project(planeRotation, vertices[5], center), project(planeRotation, vertices[4], center));
-			break;
-		case 5:
-			drawSquare(image, project(planeRotation, vertices[2], center), project(planeRotation, vertices[3], center), project(planeRotation, vertices[7], center), project(planeRotation, vertices[6], center));
-			break;
+	for (i = 0; i < 3; i++) {
+		drawLine(image, vertices[i], vertices[i + 1], 255);
 	}
+
+	drawLine(image, vertices[3], vertices[0], 255);
 }
 
 void testCube(char* name, Vector3D planeRotation) {
@@ -71,17 +50,19 @@ void testCube(char* name, Vector3D planeRotation) {
 	Cube cube = createCube(origin, 100);
 
 	for (i = 0; i < cube->nVertices; i++) {
-		cube->vertices[i] = rotateX(cube->vertices[i], origin, planeRotation->x, false);
-		cube->vertices[i] = rotateY(cube->vertices[i], origin, planeRotation->y, false);
+		rotateX(cube->vertices[i], origin, planeRotation->x, false);
+		rotateY(cube->vertices[i], origin, planeRotation->y, false);
+		rotateZ(cube->vertices[i], origin, planeRotation->y, false);
 	}
-	recalculateNormals(cube);
+
+	updateCube(cube);
 
 	visibleFaces(planeRotation, cube->faces, visible, 6);
 
 	Image2D image = newImage2D(500, 500);
 	for (i = 0; i < 6; i++) {
 		if (visible[i]) {
-			drawFace(image, cube->vertices, i, planeRotation);
+			drawSquare(image, cube->faces[i]->vertices);
 		}
 	}
 
@@ -92,14 +73,58 @@ void testCube(char* name, Vector3D planeRotation) {
 
 void drawCube() {
 	char nome[200];
-	float i = 0;
+	float i = PI / 4;
 	for (i = 0; i < 2 * PI; i += 0.1) {
 		sprintf(nome, "out/cube_%f", i);
 		testCube(nome, createVector3D(i, i, 0));
 	}
 }
 
+void testMath() {
+	Point3D p, p2, p3, p4, origin;
+	Vector3D v1, v2, normal;
+	Vertices vertices;
+	Face face;
+
+	p = createPoint3D(1, 1, 1);
+	origin = createVector3D(250, 250, 250);
+	printf("init   (1.0000, 1.0000, 1.0000) %s\n", toStringPoint3D(p));
+	printf("scale  (15.0000, 25.0000, 10.0000) %s\n", toStringPoint3D(scale(p, createVector3D(15, 25, 10), false)));
+	printf("-scale (1.0000, 1.0000, 1.0000) %s\n", toStringPoint3D(scale(p, createVector3D(15, 25, 10), true)));
+	printf("scale  (100.0000, 100.0000, 100.0000) %s\n", toStringPoint3D(scale(p, createVector3D(100, 100, 100), false)));
+	printf("relO   (350.0000, 350.0000, 350.0000) %s\n", toStringPoint3D(translate(p, origin, false)));
+	printf("rotX   (350.0000, 250.0000, 391.4214) %s\n", toStringPoint3D(rotateX(p, origin, PI / 4, false)));
+	printf("rotX   (420.7107, 250.0000, 279.2893) %s\n", toStringPoint3D(rotateY(p, origin, PI / 4, false)));
+	printf("rotX   (420.7107, 250.0000, 279.2893) %s\n", toStringPoint3D(rotateY(p, origin, PI / 4, false)));
+
+	p = createPoint3D(-1, 1, 1);
+	p2 = createPoint3D(1, 1, 1);
+	p3 = createPoint3D(1, -1, 1);
+	p4 = createPoint3D(-1, -1, 1);
+	v1 = translate(p2, p, true);
+	v2 = translate(p3, p, true);
+	normal = vectorProduct(v1, v2);
+	printf("V1     (2.000, 0.000, 0.000) %s\n", toStringPoint3D(v1));
+	printf("V2     (2.000, -2.000, 0.000) %s\n", toStringPoint3D(v2));
+	printf("normal (0.000, 0.000, -4.000) %s\n", toStringPoint3D(normal));
+	printf("unit   (0.000, 0.000, -1.000) %s\n", toStringPoint3D(normalizedVector3D(normal)));
+
+	p = createPoint3D(-2, 2, 2);
+	p2 = createPoint3D(2, 2, 2);
+	p3 = createPoint3D(2, -2, 2);
+	p4 = createPoint3D(-2, -2, 2);
+	vertices = (Vertices) malloc(sizeof(Vertex) * 4);
+	vertices[0] = p;
+	vertices[1] = p2;
+	vertices[2] = p3;
+	vertices[3] = p4;
+	face = createFace(vertices, false);
+	normal = calculateNormal(face->vertices, 4, createVector3D(1, 1, 1), createVector3D(0, 0, 0));
+	printf("normal (0.000, 0.000, -1.000) %s\n", toStringPoint3D(normal));
+}
+
 int main(int argc, char* argv[]) {
+	testMath();
 	//drawStar();
 
 	drawCube();

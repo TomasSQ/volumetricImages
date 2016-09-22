@@ -1,15 +1,24 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "math3D.h"
 
-Point3D project(Vector3D planeRotation, Point3D p, int D) {
-	Point3D p2 = rotateX(p, createPoint3D(D, D, D), planeRotation->x, false);
-	p2 = rotateY(p2, createPoint3D(D, D, D), planeRotation->y, false);
-	p2->x += 0;
-	p2->y += 0;
-	p2->z = 0;
+Point3D copy(Point3D p, Point3D q) {
+	p->x = q->x;
+	p->y = q->y;
+	p->z = q->z;
 
-	return p2;
+	return p;
+}
+
+Point3D project(Vector3D planeRotation, Point3D p, int D) {
+	// Point3D p2 = rotateX(p, createPoint3D(D, D, D), planeRotation->x, false);
+	// p2 = rotateY(p2, createPoint3D(D, D, D), planeRotation->y, false);
+	// p2->x += 0;
+	// p2->y += 0;
+	// p2->z = 0;
+
+	return p;
 }
 
 Vector3D vectorProduct(Vector3D a, Vector3D b) {
@@ -19,12 +28,16 @@ Vector3D vectorProduct(Vector3D a, Vector3D b) {
 		a->x * b->y - a->y * b->x);
 }
 
-Vector3D calculateNormal(Vertices vertices, int vCount) {
+Vector3D calculateNormal(Vertices vertices, int vCount, Vector3D factor, Point3D origin) {
 	if (vCount <= 2) {
 		return createVector3D(0, 0, 0);
 	}
-	Vector3D a = translate(vertices[0], vertices[1], false);
-	Vector3D b = translate(vertices[vCount - 2], vertices[vCount - 1], false);
+	Vector3D v0 = translate(scale(copy(createVector3D(0, 0, 0), vertices[0]), factor, true), origin, true);
+	Vector3D v1 = translate(scale(copy(createVector3D(0, 0, 0), vertices[1]), factor, true), origin, true);
+	Vector3D v2 = translate(scale(copy(createVector3D(0, 0, 0), vertices[2]), factor, true), origin, true);
+
+	Vector3D a = translate(v1, v0, true);
+	Vector3D b = translate(v2, v0, true);
 
 	return normalizedVector3D(vectorProduct(a, b));
 }
@@ -39,72 +52,80 @@ float moduleOfVector3D(Vector3D a) {
 
 Vector3D normalizedVector3D(Vector3D a) {
 	float module = moduleOfVector3D(a);
-	return createVector3D(
-		a->x / module,
-		a->y / module,
-		a->z / module);
+	if (-0.00001 < module && module < 0.00001) {
+		a->x = 0;
+		a->y = 0;
+		a->z = 0;
+
+		return a;
+	}
+
+	a->x /= module,
+	a->y /= module,
+	a->z /= module;
+
+	return a;
 }
 
 Point3D translate(Point3D p, Vector3D inc, bool inverse) {
-	return createPoint3D(
-		p->x + (inverse ? -1.0 : 1.0) * inc->x,
-		p->y + (inverse ? -1.0 : 1.0) * inc->y,
-		p->z + (inverse ? -1.0 : 1.0) * inc->z);
+	p->x += (inverse ? -1.0 : 1.0) * inc->x,
+	p->y += (inverse ? -1.0 : 1.0) * inc->y,
+	p->z += (inverse ? -1.0 : 1.0) * inc->z;
+
+	return p;
 }
 
 Point3D scale(Point3D p, Vector3D factor, bool inverse) {
-	return createPoint3D(
-		p->x * (inverse ? 1.0 / factor->x : factor->x),
-		p->y * (inverse ? 1.0 / factor->y : factor->y),
-		p->z * (inverse ? 1.0 / factor->z : factor->z));
+	p->x *= (inverse ? 1.0 / factor->x : factor->x),
+	p->y *= (inverse ? 1.0 / factor->y : factor->y),
+	p->z *= (inverse ? 1.0 / factor->z : factor->z);
+
+	return p;
 }
 
 Point3D rotateZ(Point3D p, Point3D origin, float theta, bool inverse) {
 	theta = inverse ? -theta : theta;
-	Point3D q = translate(p, origin, true);
 
-	Point3D q2 = createPoint3D(
-		q->x * COS(theta) + q->y * SIN(theta),
-		-q->x * SIN(theta) + q->y * COS(theta),
-		q->z);
+	translate(p, origin, true);
 
-	free(q);
+	Point3D q = createPoint3D(
+		p->x * COS(theta) + p->y * SIN(theta),
+		-p->x * SIN(theta) + p->y * COS(theta),
+		p->z);
 
-	q = translate(q2, origin, false);
-	free(q2);
-	return q;
+	translate(q, origin, false);
+
+	return copy(p, q);
 }
 
 Point3D rotateY(Point3D p, Point3D origin, float theta, bool inverse) {
 	theta = inverse ? -theta : theta;
-	Point3D q = translate(p, origin, true);
 
-	Point3D q2 = createPoint3D(
-		q->x * COS(theta) + q->z * SIN(theta),
-		q->y,
-		-q->x * SIN(theta) + q->z * COS(theta));
+	translate(p, origin, true);
 
-	free(q);
+	Point3D q = createPoint3D(
+		p->x * COS(theta) + p->z * SIN(theta),
+		p->y,
+		-p->x * SIN(theta) + p->z * COS(theta));
 
-	q = translate(q2, origin, false);
-	free(q2);
-	return q;
+	translate(q, origin, false);
+
+	return copy(p, q);
 }
 
 Point3D rotateX(Point3D p, Point3D origin, float theta, bool inverse) {
 	theta = inverse ? -theta : theta;
-	Point3D q = translate(p, origin, true);
 
-	Point3D q2 = createPoint3D(
-		q->x,
-		q->y * COS(theta) - q->z * SIN(theta),
-		q->y * SIN(theta) + q->z * COS(theta));
+	translate(p, origin, true);
 
-	free(q);
+	Point3D q = createPoint3D(
+		p->x,
+		p->y * COS(theta) - p->z * SIN(theta),
+		p->y * SIN(theta) + p->z * COS(theta));
 
-	q = translate(q2, origin, false);
-	free(q2);
-	return q;
+	translate(q, origin, false);
+
+	return copy(p, q);
 }
 
 bool samePoint(Point3D a, Point3D b) {
@@ -122,23 +143,11 @@ Point3D createPoint3D(float x, float y, float z) {
 }
 
 Vertex createVertex(float x, float y, float z) {
-	Vertex v = (Vertex) malloc(sizeof(_point3D));
-
-	v->x = x;
-	v->y = y;
-	v->z = z;
-
-	return v;
+	return createPoint3D(x, y, z);
 }
 
 Vector3D createVector3D(float x, float y, float z) {
-	Vector3D v = (Vector3D) malloc(sizeof(_point3D));
-
-	v->x = x;
-	v->y = y;
-	v->z = z;
-
-	return v;
+	return createPoint3D(x, y, z);
 }
 
 Edge createEdge(Vertex a, Vertex b) {
@@ -150,10 +159,11 @@ Edge createEdge(Vertex a, Vertex b) {
 	return e;
 }
 
-Face createFace(Vertices vertices) {
+Face createFace(Vertices vertices, bool invertedNormal) {
 	int i;
 	Face f = (Face) malloc(sizeof(_face));
-	f->normal = calculateNormal(vertices, 4);
+	f->normal = createVector3D(0, 0, 0);
+	f->invertedNormal = invertedNormal;
 	f->vertices = (Vertices) malloc(sizeof(Vertex) * 4);
 
 	for (i = 0; i < 4; i++) {
@@ -161,4 +171,11 @@ Face createFace(Vertices vertices) {
 	}
 
 	return f;
+}
+
+char* toStringPoint3D(Point3D p) {
+	char* str = (char*) malloc(sizeof(char) * (2 + 2 + 2 + 3 * (1 + 4 + 1 + 4)));
+	sprintf(str, "(%.4f, %.4f, %.4f)", p->x, p->y, p->z);
+
+	return str;
 }

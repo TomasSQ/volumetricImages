@@ -2,15 +2,7 @@
 
 #include "cube.h"
 
-void recalculateNormals(Cube cube) {
-	int face;
-
-	for (face = 0; face < cube->nFaces; face++) {
-		cube->faces[face]->normal = calculateNormal(cube->faces[face]->vertices, 4);
-	}
-}
-
-void defineVertices(Cube cube, Point3D origin, float size) {
+void defineVertices(Cube cube) {
 	int vertex;
 	int vertexMap[8][3] = {
 		{-1,  1,  1},
@@ -26,21 +18,22 @@ void defineVertices(Cube cube, Point3D origin, float size) {
 	cube->vertices = (Vertices) malloc(sizeof(Vertex) * cube->nVertices);
 	for (vertex = 0; vertex < cube->nVertices; vertex++) {
 		cube->vertices[vertex] = createVertex(
-			vertexMap[vertex][0] * size + origin->x,
-			vertexMap[vertex][1] * size + origin->y,
-			vertexMap[vertex][2] * size + origin->z);
+			vertexMap[vertex][0],
+			vertexMap[vertex][1],
+			vertexMap[vertex][2]);
+		cube->vertices[vertex] = translate(scale(cube->vertices[vertex], cube->size, false), cube->origin, false);
 	}
 }
 
 void defineFaces(Cube cube) {
 	int face, vertex;
-	int faceMap[6][4] = {
-		{0, 1, 2, 3},
-		{4, 5, 6, 7},
-		{0, 4, 7, 3},
-		{1, 5, 6, 2},
-		{0, 4, 5, 1},
-		{3, 7, 6, 2},
+	int faceMap[6][5] = {
+		{0, 1, 2, 3, 0},
+		{4, 5, 6, 7, 1},
+		{0, 4, 7, 3, 1},
+		{1, 5, 6, 2, 0},
+		{0, 4, 5, 1, 0},
+		{3, 7, 6, 2, 1},
 	};
 
 
@@ -52,7 +45,7 @@ void defineFaces(Cube cube) {
 			faceVertices[vertex] = cube->vertices[faceMap[face][vertex]];
 		}
 
-		cube->faces[face] = createFace(faceVertices);
+		cube->faces[face] = createFace(faceVertices, faceMap[face][4]);
 	}
 }
 
@@ -72,15 +65,31 @@ void defineEdges(Cube cube) {
 
 Cube createCube(Point3D origin, float size) {
 	Cube cube = (Cube) malloc(sizeof(_cube));
+	cube->origin = createPoint3D(origin->x, origin->y, origin->z);
+	cube->size = createVector3D(size, size, size);
 	cube->nFaces = 6;
 	cube->nEdges = 12;
 	cube->nVertices = 8;
 
-	defineVertices(cube, origin, size);
+	defineVertices(cube);
+
+	updateCube(cube);
+
+	return cube;
+}
+
+void updateCube(Cube cube) {
+	int face;
+
 	defineFaces(cube);
 	defineEdges(cube);
 
-	return cube;
+	for (face = 0; face < cube->nFaces; face++) {
+		cube->faces[face]->normal = calculateNormal(cube->faces[face]->vertices, 4, cube->size, cube->origin);
+		if (cube->faces[face]->invertedNormal) {
+			cube->faces[face]->normal = scale(cube->faces[face]->normal, createVector3D(-1, -1, -1), false);
+		}
+	}
 }
 
 void destroyCube(Cube cube) {

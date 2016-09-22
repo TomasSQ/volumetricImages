@@ -24,6 +24,7 @@ typedef _edge* Edge;
 
 typedef struct {
 	Vector3D normal;
+	bool invertedNormal;
 	Vertices vertices;
 } _face;
 typedef _face* Face;
@@ -32,11 +33,13 @@ Point3D createPoint3D(float x, float y, float z);
 Vertex createVertex(float x, float y, float z);
 Vector3D createVector3D(float x, float y, float z);
 
+char* toStringPoint3D(Point3D p);
+
 bool samePoint(Point3D a, Point3D b);
 
 Edge createEdge(Vertex a, Vertex b);
 
-Face createFace(Vertices vertices);
+Face createFace(Vertices vertices, bool invertedNormal);
 
 Point3D translate(Point3D p, Vector3D inc, bool inverse);
 Point3D scale(Point3D p, Vector3D factor, bool inverse);
@@ -48,7 +51,7 @@ float innerProduct(Vector3D a, Vector3D b);
 float moduleOfVector3D(Vector3D a);
 Vector3D vectorProduct(Vector3D a, Vector3D b);
 Vector3D normalizedVector3D(Vector3D a);
-Vector3D calculateNormal(Vertices vertices, int vCount);
+Vector3D calculateNormal(Vertices vertices, int vCount, Vector3D scale, Point3D origin);
 Point3D project(Vector3D planeRotation, Point3D p, int D);
 
 #endif
