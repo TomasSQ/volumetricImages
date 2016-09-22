@@ -55,4 +55,6 @@ Vector3D calculateNormal(Vertices vertices, int vCount);
 Vector3D calculateFaceNormal(Face face);
 Point3D project(Vector3D planeRotation, Point3D p, int D);
 
+Point3D copy(Point3D destination, Point3D origin);
+
 #endif

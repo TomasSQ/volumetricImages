@@ -36,20 +36,31 @@ Inc getInc(Point3D start, Point3D end, bool ignoreZ) {
 		inc.n = ABS(deltaZ) + 1;
 		inc.inc->z = SIGN(deltaZ);
 		inc.inc->x = inc.inc->z * deltaX / deltaZ;
-		inc.inc->y = inc.inc->z * deltaZ / deltaZ;
+		inc.inc->y = inc.inc->z * deltaY / deltaZ;
 	}
 
 	return inc;
 }
 
-void drawSquare(Image2D image, Vertices vertices) {
+void drawSquare(Image2D image, Vertices vertices, int intensity) {
+	Vertex start, end;
+	Inc inc;
 	int i;
+	int extraStepsFactor = 10;
 
-	for (i = 0; i < 3; i++) {
-		drawLine2D(image, vertices[i], vertices[i + 1], 255);
+	inc = getInc(vertices[0], vertices[3], false);
+	start = copy(createPoint3D(0, 0, 0), vertices[0]);
+	end = copy(createPoint3D(0, 0, 0), vertices[1]);
+
+	for (i = 0; i < inc.n * extraStepsFactor; i++) {
+		drawLine2D(image, start, end, intensity);
+		start->x += inc.inc->x / extraStepsFactor;
+		start->y += inc.inc->y / extraStepsFactor;
+		start->z += inc.inc->z / extraStepsFactor;
+		end->x += inc.inc->x / extraStepsFactor;
+		end->y += inc.inc->y / extraStepsFactor;
+		end->z += inc.inc->z / extraStepsFactor;
 	}
-
-	drawLine2D(image, vertices[3], vertices[0], 255);
 }
 
 void render(char* name, Vector3D planeRotation, Cube cube) {
@@ -61,7 +72,7 @@ void render(char* name, Vector3D planeRotation, Cube cube) {
 	Image2D image = newImage2D(500, 500);
 	for (i = 0; i < 6; i++) {
 		if (visible[i]) {
-			drawSquare(image, cube->faces[i]->vertices);
+			drawSquare(image, cube->faces[i]->vertices, 255 / (i + 1));
 		}
 	}
 
