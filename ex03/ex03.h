@@ -6,7 +6,7 @@
 #include "../myLib/myCommon.h"
 #include "../myLib/bitmap.h"
 
-void render(char* name, Vector3D planeRotation, Cube cube);
+void render(char* name, Image* image, Vector3D planeRotation, Cube cube);
 
 void drawLine2D(Image2D image, Point3D start, Point3D end, int intensity);
 

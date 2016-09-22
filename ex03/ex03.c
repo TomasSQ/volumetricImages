@@ -42,7 +42,7 @@ Inc getInc(Point3D start, Point3D end, bool ignoreZ) {
 	return inc;
 }
 
-void drawSquare(Image2D image, Vertices vertices, int intensity) {
+void drawSquare(Image* image, Image2D projection, Vertices vertices, int intensity) {
 	Vertex start, end;
 	Inc inc;
 	int i;
@@ -53,7 +53,7 @@ void drawSquare(Image2D image, Vertices vertices, int intensity) {
 	end = copy(createPoint3D(0, 0, 0), vertices[1]);
 
 	for (i = 0; i < inc.n * extraStepsFactor; i++) {
-		drawLine2D(image, start, end, intensity);
+		drawLine2D(projection, start, end, intensity);
 		start->x += inc.inc->x / extraStepsFactor;
 		start->y += inc.inc->y / extraStepsFactor;
 		start->z += inc.inc->z / extraStepsFactor;
@@ -63,21 +63,21 @@ void drawSquare(Image2D image, Vertices vertices, int intensity) {
 	}
 }
 
-void render(char* name, Vector3D planeRotation, Cube cube) {
+void render(char* name, Image* image, Vector3D planeRotation, Cube cube) {
 	int i;
 	bool* visible = (bool*) malloc(sizeof(bool) * 6);
 
 	visibleFaces(planeRotation, cube->faces, visible, 6);
 
-	Image2D image = newImage2D(500, 500);
+	Image2D projection = newImage2D(500, 500);
 	for (i = 0; i < 6; i++) {
 		if (visible[i]) {
-			drawSquare(image, cube->faces[i]->vertices, 255 / (i + 1));
+			drawSquare(image, projection, cube->faces[i]->vertices, 255 / (i + 1));
 		}
 	}
 
-	saveImage(name, image->img, image->width, image->height);
-	freeImage2D(image);
+	saveImage(name, projection->img, projection->width, projection->height);
+	freeImage2D(projection);
 	free(visible);
 }
 
