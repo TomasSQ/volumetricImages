@@ -63,17 +63,17 @@ void defineEdges(Cube cube) {
 	}
 }
 
-Cube createCube(Point3D origin, float size) {
+Cube createCube(Point3D origin, Vector3D size) {
 	Cube cube = (Cube) malloc(sizeof(_cube));
 	cube->origin = createPoint3D(origin->x, origin->y, origin->z);
-	cube->size = createVector3D(size, size, size);
+	cube->size = createVector3D(size->x, size->y, size->z);
 	cube->nFaces = 6;
 	cube->nEdges = 12;
 	cube->nVertices = 8;
 
 	defineVertices(cube);
-
-	updateCube(cube);
+	defineFaces(cube);
+	defineEdges(cube);
 
 	return cube;
 }
@@ -81,14 +81,8 @@ Cube createCube(Point3D origin, float size) {
 void updateCube(Cube cube) {
 	int face;
 
-	defineFaces(cube);
-	defineEdges(cube);
-
 	for (face = 0; face < cube->nFaces; face++) {
-		cube->faces[face]->normal = calculateNormal(cube->faces[face]->vertices, 4, cube->size, cube->origin);
-		if (cube->faces[face]->invertedNormal) {
-			cube->faces[face]->normal = scale(cube->faces[face]->normal, createVector3D(-1, -1, -1), false);
-		}
+		cube->faces[face]->normal = calculateFaceNormal(cube->faces[face]);
 	}
 }
 

@@ -17,7 +17,7 @@ typedef struct {
 typedef _cube* Cube;
 
 
-Cube createCube(Point3D origin, float size);
+Cube createCube(Point3D origin, Vector3D size);
 
 void updateCube(Cube cube);
 

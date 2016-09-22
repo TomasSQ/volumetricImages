@@ -47,12 +47,12 @@ void testCube(char* name, Vector3D planeRotation) {
 	int i;
 	bool* visible = (bool*) malloc(sizeof(bool) * 6);
 	Point3D origin = createPoint3D(250, 250, 250);
-	Cube cube = createCube(origin, 100);
+	Cube cube = createCube(origin, createVector3D(100, 50, 25));
 
 	for (i = 0; i < cube->nVertices; i++) {
 		rotateX(cube->vertices[i], origin, planeRotation->x, false);
 		rotateY(cube->vertices[i], origin, planeRotation->y, false);
-		rotateZ(cube->vertices[i], origin, planeRotation->y, false);
+		rotateZ(cube->vertices[i], origin, planeRotation->z, false);
 	}
 
 	updateCube(cube);
@@ -74,9 +74,9 @@ void testCube(char* name, Vector3D planeRotation) {
 void drawCube() {
 	char nome[200];
 	float i = PI / 4;
-	for (i = 0; i < 2 * PI; i += 0.1) {
+	for (i = 0; i < 2 * PI; i += 0.05) {
 		sprintf(nome, "out/cube_%f", i);
-		testCube(nome, createVector3D(i, i, 0));
+		testCube(nome, createVector3D(-i, 3 * i, -i));
 	}
 }
 
@@ -119,8 +119,14 @@ void testMath() {
 	vertices[2] = p3;
 	vertices[3] = p4;
 	face = createFace(vertices, false);
-	normal = calculateNormal(face->vertices, 4, createVector3D(1, 1, 1), createVector3D(0, 0, 0));
+	normal = calculateNormal(face->vertices, 4);
 	printf("normal (0.000, 0.000, -1.000) %s\n", toStringPoint3D(normal));
+
+	printf("p2     (2.000, 2.000, 2.000) %s\n", toStringPoint3D(p2));
+	printf("f->p2  (2.000, 2.000, 2.000) %s\n", toStringPoint3D(face->vertices[1]));
+	scale(p2, createVector3D(1.5, 2, 2.5), false);
+	printf("p2     (3.000, 4.000, 5.000) %s\n", toStringPoint3D(p2));
+	printf("f->p2  (3.000, 4.000, 5.000) %s\n", toStringPoint3D(face->vertices[1]));
 }
 
 int main(int argc, char* argv[]) {

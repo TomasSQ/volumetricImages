@@ -28,18 +28,27 @@ Vector3D vectorProduct(Vector3D a, Vector3D b) {
 		a->x * b->y - a->y * b->x);
 }
 
-Vector3D calculateNormal(Vertices vertices, int vCount, Vector3D factor, Point3D origin) {
+Vector3D calculateNormal(Vertices vertices, int vCount) {
 	if (vCount <= 2) {
 		return createVector3D(0, 0, 0);
 	}
-	Vector3D v0 = translate(scale(copy(createVector3D(0, 0, 0), vertices[0]), factor, true), origin, true);
-	Vector3D v1 = translate(scale(copy(createVector3D(0, 0, 0), vertices[1]), factor, true), origin, true);
-	Vector3D v2 = translate(scale(copy(createVector3D(0, 0, 0), vertices[2]), factor, true), origin, true);
+	Vector3D v0 = copy(createVector3D(0, 0, 0), vertices[0]);
+	Vector3D v1 = copy(createVector3D(0, 0, 0), vertices[1]);
+	Vector3D v2 = copy(createVector3D(0, 0, 0), vertices[2]);
 
 	Vector3D a = translate(v1, v0, true);
 	Vector3D b = translate(v2, v0, true);
 
 	return normalizedVector3D(vectorProduct(a, b));
+}
+
+Vector3D calculateFaceNormal(Face face) {
+	face->normal = calculateNormal(face->vertices, 4);
+	if (face->invertedNormal) {
+		scale(face->normal, createVector3D(-1, -1, -1), false);
+	}
+
+	return face->normal;
 }
 
 float innerProduct(Vector3D a, Vector3D b) {
@@ -161,14 +170,17 @@ Edge createEdge(Vertex a, Vertex b) {
 
 Face createFace(Vertices vertices, bool invertedNormal) {
 	int i;
+
 	Face f = (Face) malloc(sizeof(_face));
-	f->normal = createVector3D(0, 0, 0);
+
 	f->invertedNormal = invertedNormal;
 	f->vertices = (Vertices) malloc(sizeof(Vertex) * 4);
 
 	for (i = 0; i < 4; i++) {
 		f->vertices[i] = vertices[i];
 	}
+
+	f->normal = calculateFaceNormal(f);
 
 	return f;
 }

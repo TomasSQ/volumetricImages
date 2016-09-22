@@ -51,7 +51,8 @@ float innerProduct(Vector3D a, Vector3D b);
 float moduleOfVector3D(Vector3D a);
 Vector3D vectorProduct(Vector3D a, Vector3D b);
 Vector3D normalizedVector3D(Vector3D a);
-Vector3D calculateNormal(Vertices vertices, int vCount, Vector3D scale, Point3D origin);
+Vector3D calculateNormal(Vertices vertices, int vCount);
+Vector3D calculateFaceNormal(Face face);
 Point3D project(Vector3D planeRotation, Point3D p, int D);
 
 #endif
