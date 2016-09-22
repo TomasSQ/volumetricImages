@@ -2,14 +2,54 @@
 
 #include "ex03.h"
 
+typedef struct {
+	Point3D inc;
+	int n;
+} Inc;
+
+Inc getInc(Point3D start, Point3D end, bool ignoreZ) {
+	float deltaX, deltaY, deltaZ;
+
+	Inc inc;
+	inc.n = 0;
+	inc.inc = createPoint3D(0, 0, 0);
+
+	if (samePoint(start, end)) {
+		return inc;
+	}
+
+	deltaX = end->x - start->x;
+	deltaY = end->y - start->y;
+	deltaZ = end->z - start->z;
+
+	if (ABS(deltaX) >= ABS(deltaY) && (ignoreZ || ABS(deltaX) >= ABS(deltaZ))) {
+		inc.n = ABS(deltaX) + 1;
+		inc.inc->x = SIGN(deltaX);
+		inc.inc->y = inc.inc->x * deltaY / deltaX;
+		inc.inc->z = inc.inc->x * deltaZ / deltaX;
+	} else if (ABS(deltaY) >= ABS(deltaX) && (ignoreZ || ABS(deltaY) >= ABS(deltaZ))) {
+		inc.n = ABS(deltaY) + 1;
+		inc.inc->y = SIGN(deltaY);
+		inc.inc->x = inc.inc->y * deltaX / deltaY;
+		inc.inc->z = inc.inc->y * deltaZ / deltaY;
+	} else if (!ignoreZ) {
+		inc.n = ABS(deltaZ) + 1;
+		inc.inc->z = SIGN(deltaZ);
+		inc.inc->x = inc.inc->z * deltaX / deltaZ;
+		inc.inc->y = inc.inc->z * deltaZ / deltaZ;
+	}
+
+	return inc;
+}
+
 void drawSquare(Image2D image, Vertices vertices) {
 	int i;
 
 	for (i = 0; i < 3; i++) {
-		drawLine(image, vertices[i], vertices[i + 1], 255);
+		drawLine2D(image, vertices[i], vertices[i + 1], 255);
 	}
 
-	drawLine(image, vertices[3], vertices[0], 255);
+	drawLine2D(image, vertices[3], vertices[0], 255);
 }
 
 void render(char* name, Vector3D planeRotation, Cube cube) {
@@ -41,42 +81,25 @@ void visibleFaces(Vector3D planeRotation, Face* faces, bool* visibleFaces, int n
 	}
 }
 
-void draw(Image2D image, Point3D start, float dx, float dy, int n, int intensity) {
+void draw(Image2D image, Point3D start, Inc inc, int intensity) {
 	int i;
 	Point3D p = createPoint3D(start->x, start->y, start->z);
 
-	for (i = 0; i < n; i++) {
+	for (i = 0; i < inc.n; i++) {
 		if (0 <= p->y && p->y < image->height && 0 <= p->x && p->x < image->width) {
 			image->img[(int) p->y][(int) p->x] = intensity;
 		}
 
-		p->x += dx;
-		p->y += dy;
+		p->x += inc.inc->x;
+		p->y += inc.inc->y;
+		p->z += inc.inc->z;
 	}
 }
 
-void drawLine(Image2D image, Point3D start, Point3D end, int intensity) {
-	int n;
-	float deltaX, deltaY, dx, dy;
+void drawLine2D(Image2D image, Point3D start, Point3D end, int intensity) {
+	drawLine(image, start, end, intensity, true);
+}
 
-	if (samePoint(start, end)) {
-		n = 0;
-		dx = 0;
-		dy = 0;
-	} else {
-		deltaX = end->x - start->x;
-		deltaY = end->y - start->y;
-
-		if (ABS(deltaX) >= ABS(deltaY)) {
-			n = ABS(deltaX) + 1;
-			dx = SIGN(deltaX);
-			dy = dx * deltaY / deltaX;
-		} else {
-			n = ABS(deltaY) + 1;
-			dy = SIGN(deltaY);
-			dx = dy * deltaX / deltaY;
-		}
-	}
-
-	draw(image, start, dx, dy, n, intensity);
+void drawLine(Image2D image, Point3D start, Point3D end, int intensity, bool ignoreZ) {
+	draw(image, start, getInc(start, end, ignoreZ), intensity);
 }

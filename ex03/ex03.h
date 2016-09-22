@@ -8,7 +8,9 @@
 
 void render(char* name, Vector3D planeRotation, Cube cube);
 
-void drawLine(Image2D image, Point3D start, Point3D end, int intensity);
+void drawLine2D(Image2D image, Point3D start, Point3D end, int intensity);
+
+void drawLine(Image2D image, Point3D start, Point3D end, int intensity, bool ignoreZ);
 
 void visibleFaces(Vector3D planeRotation, Face* faces, bool* visibleFaces, int nFaces);
 
