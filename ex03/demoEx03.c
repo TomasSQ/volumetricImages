@@ -5,7 +5,7 @@
 
 #include "ex03.h"
 
-void drawStar() {
+void testStar() {
 	int i, max, step = 10;
 
 	Image2D image = newImage2D(500, 500);
@@ -33,49 +33,27 @@ void drawStar() {
 	freeImage2D(image);
 }
 
-void drawSquare(Image2D image, Vertices vertices) {
-	int i;
-
-	for (i = 0; i < 3; i++) {
-		drawLine(image, vertices[i], vertices[i + 1], 255);
-	}
-
-	drawLine(image, vertices[3], vertices[0], 255);
-}
-
-void testCube(char* name, Vector3D planeRotation, Vector3D scaleFactor, Cube cube) {
-	int i;
-	bool* visible = (bool*) malloc(sizeof(bool) * 6);
-
-	scaleCube(cube, scaleFactor);
-	rotateCube(cube, planeRotation);
-
-	visibleFaces(planeRotation, cube->faces, visible, 6);
-
-	Image2D image = newImage2D(500, 500);
-	for (i = 0; i < 6; i++) {
-		if (visible[i]) {
-			drawSquare(image, cube->faces[i]->vertices);
-		}
-	}
-
-	saveImage(name, image->img, image->width, image->height);
-	freeImage2D(image);
-	free(visible);
-}
-
-void drawCube() {
-	char nome[200];
+void testCube() {
+	char name[200];
 	float i = PI / 4;
 	float inc = 0.05;
 	int sign;
 	Point3D origin = createPoint3D(250, 250, 250);
+	Vector3D planeRotation = NULL;
+	Vector3D scaleFactor = NULL;
 	Cube cube = createCube(origin, createVector3D(100, 50, 25));
 
 	for (i = 0; i < 2 * PI; i += inc) {
 		sign = ((int) i) % 2 == 0 ? 1 : -1;
-		sprintf(nome, "out/cube_%f", i);
-		testCube(nome, createVector3D(-inc, 3 * inc, -inc), createVector3D(1 + sign * inc, 1 + sign * inc, 1 + sign * inc), cube);
+		sprintf(name, "out/cube_%f", i);
+
+		planeRotation = createVector3D(-inc, 3 * inc, -inc);
+		scaleFactor = createVector3D(1 + sign * inc, 1 + sign * inc, 1 + sign * inc);
+
+		scaleCube(cube, scaleFactor);
+		rotateCube(cube, planeRotation);
+
+		render(name, planeRotation , cube);
 	}
 }
 
@@ -130,9 +108,9 @@ void testMath() {
 
 int main(int argc, char* argv[]) {
 	testMath();
-	//drawStar();
+	testStar();
 
-	drawCube();
+	testCube();
 
 	return 0;
 }

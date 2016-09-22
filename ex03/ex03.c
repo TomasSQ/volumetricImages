@@ -2,6 +2,35 @@
 
 #include "ex03.h"
 
+void drawSquare(Image2D image, Vertices vertices) {
+	int i;
+
+	for (i = 0; i < 3; i++) {
+		drawLine(image, vertices[i], vertices[i + 1], 255);
+	}
+
+	drawLine(image, vertices[3], vertices[0], 255);
+}
+
+void render(char* name, Vector3D planeRotation, Cube cube) {
+	int i;
+	bool* visible = (bool*) malloc(sizeof(bool) * 6);
+
+	visibleFaces(planeRotation, cube->faces, visible, 6);
+
+	Image2D image = newImage2D(500, 500);
+	for (i = 0; i < 6; i++) {
+		if (visible[i]) {
+			drawSquare(image, cube->faces[i]->vertices);
+		}
+	}
+
+	saveImage(name, image->img, image->width, image->height);
+	freeImage2D(image);
+	free(visible);
+}
+
+
 void visibleFaces(Vector3D planeRotation, Face* faces, bool* visibleFaces, int nFaces) {
 	int i = 0;
 
