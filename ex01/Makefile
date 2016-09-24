@@ -9,7 +9,7 @@ clean:
 	rm -rf ex01.o out
 
 run:
-	mkdir -p out && rm -f out/z_* && clear && make && ./ex01.o ../libmo815-3dvis/data/skull.scn out/z 25
+	mkdir -p out && rm -f out/z_* && clear && make && ./ex01.o ../libmo815-3dvis/data/brain.scn out/z 25
 
 gif:
 	convert -delay 0 -loop 0 out/z_R_A_*.pgm ~/Desktop/axial01.gif

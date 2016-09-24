@@ -33,7 +33,7 @@ void testStar() {
 	freeImage2D(image);
 }
 
-void testCube(Image* image) {
+void testCube() {
 	char name[200];
 	float i = PI / 4;
 	float inc = 0.05;
@@ -53,7 +53,7 @@ void testCube(Image* image) {
 		scaleCube(cube, scaleFactor);
 		rotateCube(cube, planeRotation);
 
-		render(name, image, planeRotation , cube);
+		render(name, planeRotation , cube);
 	}
 }
 
@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
 	testMath();
 	testStar();
 
-	testCube(ReadImage(argv[1]));
+	testCube();
 
 	return 0;
 }
