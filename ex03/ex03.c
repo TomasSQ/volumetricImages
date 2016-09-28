@@ -42,18 +42,37 @@ Inc getInc(Point3D start, Point3D end, bool ignoreZ) {
 	return inc;
 }
 
-void drawSquare(Image2D image, Vertices vertices, int intensity) {
+void drawLineOfSquare(Image2D image, Point3D start, Inc inc, Image* img) {
+	int i, voxel;
+	Point3D p = createPoint3D(start->x, start->y, start->z);
+
+	for (i = 0; i < inc.n; i++) {
+		if (0 <= p->y && p->y < image->height && 0 <= p->x && p->x < image->width) {
+			voxel = (((int) p->z) * img->xsize * img->ysize + ((int) p->y) * img->xsize + ((int) p->x));
+			if (image->img[(int) p->y][(int) p->x] == 0) {
+				image->img[(int) p->y][(int) p->x] = voxel > 0 && voxel < img->n ? img->val[voxel] : 0;
+			}
+		}
+
+		p->x += inc.inc->x;
+		p->y += inc.inc->y;
+		p->z += inc.inc->z;
+	}
+}
+
+
+void drawSquare(Image2D image, Vertices vertices, int intensity, Image* img) {
 	Vertex start, end;
 	Inc inc;
 	int i;
-	int extraStepsFactor = 10;
+	float extraStepsFactor = 10;
 
 	inc = getInc(vertices[0], vertices[3], false);
 	start = copy(createPoint3D(0, 0, 0), vertices[0]);
 	end = copy(createPoint3D(0, 0, 0), vertices[1]);
 
 	for (i = 0; i < inc.n * extraStepsFactor; i++) {
-		drawLine2D(image, start, end, intensity);
+		drawLineOfSquare(image, start, getInc(start, end, false), img);
 		start->x += inc.inc->x / extraStepsFactor;
 		start->y += inc.inc->y / extraStepsFactor;
 		start->z += inc.inc->z / extraStepsFactor;
@@ -63,16 +82,19 @@ void drawSquare(Image2D image, Vertices vertices, int intensity) {
 	}
 }
 
-void render(char* name, Vector3D planeRotation, Cube cube) {
-	int i;
+void render(char* name, Vector3D planeRotation, Cube cube, Image* img) {
+	int i, f;
 	bool* visible = (bool*) malloc(sizeof(bool) * 6);
 
 	visibleFaces(planeRotation, cube->faces, visible, 6);
 
-	Image2D image = newImage2D(500, 500);
+	Image2D image = newImage2D(157, 255);
 	for (i = 0; i < 6; i++) {
 		if (visible[i]) {
-			drawSquare(image, cube->faces[i]->vertices, 255 / (i + 1));
+			drawSquare(image, cube->faces[i]->vertices, 255 / (i + 1), img);
+			for (f = 0; f < 3; f++) {
+				drawLine(image, cube->faces[i]->vertices[f], cube->faces[i]->vertices[f + 1], 255, false);
+			}
 		}
 	}
 

@@ -33,15 +33,16 @@ void testStar() {
 	freeImage2D(image);
 }
 
-void testCube() {
+void testCube(Image* image) {
 	char name[200];
 	float i = PI / 4;
 	float inc = 0.05;
 	int sign;
-	Point3D origin = createPoint3D(250, 250, 250);
+	Point3D origin = createPoint3D(image->xsize / 2, image->zsize / 2, image->ysize / 2);
 	Vector3D planeRotation = NULL;
 	Vector3D scaleFactor = NULL;
-	Cube cube = createCube(origin, createVector3D(100, 50, 25));
+	Cube cube = createCube(origin, createVector3D(50, 50, 20));
+	printf("%d %d %d\n", image->xsize, image->ysize, image->zsize);
 
 	for (i = 0; i < 2 * PI; i += inc) {
 		sign = ((int) i) % 2 == 0 ? 1 : -1;
@@ -53,7 +54,7 @@ void testCube() {
 		scaleCube(cube, scaleFactor);
 		rotateCube(cube, planeRotation);
 
-		render(name, planeRotation , cube);
+		render(name, planeRotation , cube, image);
 	}
 }
 
@@ -110,7 +111,7 @@ int main(int argc, char* argv[]) {
 	testMath();
 	testStar();
 
-	testCube();
+	testCube(ReadImage(argv[1]));
 
 	return 0;
 }
