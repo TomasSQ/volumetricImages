@@ -42,7 +42,23 @@ Inc getInc(Point3D start, Point3D end, bool ignoreZ) {
 	return inc;
 }
 
-void drawLineOfSquare(Image2D image, Point3D start, Inc inc, Image* img, Vector3D reverseRotation, Point3D origin) {
+Point3D reverseRotation(Point3D p, Point3D origin, Vector3D rotation) {
+	Point3D aux = copy(createPoint3D(0, 0, 0), p);
+
+	if (rotation->y != 0) {
+		aux = rotateY(aux, origin, rotation->y, true);
+	}
+	if (rotation->x != 0) {
+		aux = rotateX(aux, origin, rotation->x, true);
+	}
+	if (rotation->z != 0) {
+		aux = rotateZ(aux, origin, rotation->z, true);
+	}
+
+	return aux;
+}
+
+void drawLineOfSquare(Image2D image, Point3D start, Inc inc, Image* img, Vector3D rotation, Point3D origin) {
 	int i, x, y, voxel;
 	Point3D p = createPoint3D(start->x, start->y, start->z);
 	Point3D aux;
@@ -50,14 +66,16 @@ void drawLineOfSquare(Image2D image, Point3D start, Inc inc, Image* img, Vector3
 	for (i = 0; i < inc.n; i++) {
 		if (0 <= p->y && p->y < image->height && 0 <= p->x && p->x < image->width) {
 			voxel = (((int) p->z) * img->xsize * img->ysize + ((int) p->y) * img->xsize + ((int) p->x));
-			if (reverseRotation == NULL) {
+			if (0 > p->z || p->z > img->zsize || 0 > p->y || p->y > img->ysize || 0 > p->x || p->x > img->xsize) {
+				voxel = img->n + 1;
+			}
+			if (rotation == NULL) {
 				x = p->x;
 				y = p->y;
 			} else {
-				aux = rotateX(rotateY(rotateZ(copy(createPoint3D(0, 0, 0), p), origin, reverseRotation->z, true), origin, reverseRotation->y, true), origin, reverseRotation->x, true);
+				aux = reverseRotation(p, origin, rotation);
 				x = aux->x;
 				y = aux->y;
-				// printf("%d\t%d\n", x, y);
 			}
 			if (0 < x && x < image->width && 0 < y && y < image->height && image->img[y][x] == 0) {
 				image->img[y][x] = voxel > 0 && voxel < img->n ? img->val[voxel] : 0;

@@ -70,7 +70,7 @@ void testSlice(Image* image) {
 	for (i = 0; i < 2 * PI; i += inc) {
 		sprintf(name, "out/slice_%f", i);
 
-		Image2D slice = getSlice(origin, createVector3D(i, i, i), image);
+		Image2D slice = getSlice(origin, createVector3D(i, i, 0), image);
 		saveImage(name, slice->img, slice->width, slice->height);
 		freeImage2D(slice);
 	}
