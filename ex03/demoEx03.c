@@ -54,7 +54,9 @@ void testCube(Image* image) {
 		scaleCube(cube, scaleFactor);
 		rotateCube(cube, planeRotation);
 
-		render(name, planeRotation , cube, image);
+		Image2D cubeImage = render(planeRotation , cube, image);
+		saveImage(name, cubeImage->img, cubeImage->width, cubeImage->height);
+		freeImage2D(cubeImage);
 	}
 }
 
@@ -75,7 +77,7 @@ void testSlice(Image* image) {
 		planeRotation = createVector3D(-inc, 3 * inc, -inc);
 		scaleFactor = createVector3D(1 + sign * inc, 1 + sign * inc, 1 + sign * inc);
 
-		// getSlice(name, planeRotation , cube, image);
+		getSlice(planeRotation, image);
 	// }
 }
 

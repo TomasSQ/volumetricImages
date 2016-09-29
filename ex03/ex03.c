@@ -82,7 +82,7 @@ void drawSquare(Image2D image, Vertices vertices, int intensity, Image* img) {
 	}
 }
 
-void render(char* name, Vector3D planeRotation, Cube cube, Image* img) {
+Image2D render(Vector3D planeRotation, Cube cube, Image* img) {
 	int i, f;
 	bool* visible = (bool*) malloc(sizeof(bool) * 6);
 
@@ -99,11 +99,14 @@ void render(char* name, Vector3D planeRotation, Cube cube, Image* img) {
 		}
 	}
 
-	saveImage(name, image->img, image->width, image->height);
-	freeImage2D(image);
 	free(visible);
+
+	return image;
 }
 
+Image2D getSlice(Vector3D planeRotation, Image* image) {
+	return NULL;
+}
 
 void visibleFaces(Vector3D planeRotation, Face* faces, bool* visibleFaces, int nFaces) {
 	int i = 0;
