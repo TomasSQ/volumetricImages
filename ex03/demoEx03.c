@@ -64,21 +64,16 @@ void testSlice(Image* image) {
 	char name[200];
 	float i = PI / 4;
 	float inc = 0.05;
-	int sign;
 	Point3D origin = createPoint3D(image->xsize / 2, image->ysize / 2, image->zsize / 2);
-	Vector3D planeRotation = NULL;
-	Vector3D scaleFactor = NULL;
 	printf("%d %d %d\n", image->xsize, image->ysize, image->zsize);
 
-	// for (i = 0; i < 2 * PI; i += inc) {
-		sign = ((int) i) % 2 == 0 ? 1 : -1;
+	for (i = 0; i < 2 * PI; i += inc) {
 		sprintf(name, "out/slice_%f", i);
 
-		planeRotation = createVector3D(-inc, 3 * inc, -inc);
-		scaleFactor = createVector3D(1 + sign * inc, 1 + sign * inc, 1 + sign * inc);
-
-		getSlice(planeRotation, image);
-	// }
+		Image2D slice = getSlice(origin, createVector3D(i, i, i), image);
+		saveImage(name, slice->img, slice->width, slice->height);
+		freeImage2D(slice);
+	}
 }
 
 

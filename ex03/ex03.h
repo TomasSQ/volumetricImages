@@ -8,7 +8,7 @@
 
 Image2D render(Vector3D planeRotation, Cube cube, Image* i);
 
-Image2D getSlice(Vector3D planeRotation, Image* image);
+Image2D getSlice(Point3D origin, Vector3D normal, Image* image);
 
 void drawLine2D(Image2D image, Point3D start, Point3D end, int intensity);
 
