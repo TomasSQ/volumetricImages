@@ -9,7 +9,7 @@ clean:
 	rm -rf ex03.o out
 
 run:
-	mkdir -p out && rm -f out/cube_* && clear && make && ./ex03.o ../libmo815-3dvis/data/brain.scn
+	mkdir -p out && rm -f out/cube_* && clear && make && ./ex03.o s ../libmo815-3dvis/data/brain.scn
 
 gif:
 	convert -delay 0 -loop 0 out/cube_*.pgm ~/Desktop/cube.gif

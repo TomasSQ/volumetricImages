@@ -38,10 +38,10 @@ void testCube(Image* image) {
 	float i = PI / 4;
 	float inc = 0.05;
 	int sign;
-	Point3D origin = createPoint3D(image->xsize / 2, image->zsize / 2, image->ysize / 2);
+	Point3D origin = createPoint3D(image->xsize / 2, image->ysize / 2, image->zsize / 2);
 	Vector3D planeRotation = NULL;
 	Vector3D scaleFactor = NULL;
-	Cube cube = createCube(origin, createVector3D(50, 50, 20));
+	Cube cube = createCube(origin, createVector3D(50, 50, 50));
 	printf("%d %d %d\n", image->xsize, image->ysize, image->zsize);
 
 	for (i = 0; i < 2 * PI; i += inc) {
@@ -57,6 +57,28 @@ void testCube(Image* image) {
 		render(name, planeRotation , cube, image);
 	}
 }
+
+void testSlice(Image* image) {
+	char name[200];
+	float i = PI / 4;
+	float inc = 0.05;
+	int sign;
+	Point3D origin = createPoint3D(image->xsize / 2, image->ysize / 2, image->zsize / 2);
+	Vector3D planeRotation = NULL;
+	Vector3D scaleFactor = NULL;
+	printf("%d %d %d\n", image->xsize, image->ysize, image->zsize);
+
+	// for (i = 0; i < 2 * PI; i += inc) {
+		sign = ((int) i) % 2 == 0 ? 1 : -1;
+		sprintf(name, "out/slice_%f", i);
+
+		planeRotation = createVector3D(-inc, 3 * inc, -inc);
+		scaleFactor = createVector3D(1 + sign * inc, 1 + sign * inc, 1 + sign * inc);
+
+		// getSlice(name, planeRotation , cube, image);
+	// }
+}
+
 
 void testMath() {
 	Point3D p, p2, p3, p4, origin;
@@ -110,8 +132,13 @@ void testMath() {
 int main(int argc, char* argv[]) {
 	testMath();
 	testStar();
-
-	testCube(ReadImage(argv[1]));
+	if (argv[1][0] == 'c') {
+		testCube(ReadImage(argv[2]));
+		system("convert -delay 0 -loop 0 out/cube_*.pgm ~/Desktop/cube.gif");
+	} else if (argv[1][0] == 's') {
+		testSlice(ReadImage(argv[2]));
+		system("convert -delay 0 -loop 0 out/slice_*.pgm ~/Desktop/slice.gif");
+	}
 
 	return 0;
 }

@@ -88,13 +88,14 @@ void render(char* name, Vector3D planeRotation, Cube cube, Image* img) {
 
 	visibleFaces(planeRotation, cube->faces, visible, 6);
 
-	Image2D image = newImage2D(157, 255);
+	Image2D image = newImage2D(img->xsize, img->ysize);
 	for (i = 0; i < 6; i++) {
 		if (visible[i]) {
 			drawSquare(image, cube->faces[i]->vertices, 255 / (i + 1), img);
 			for (f = 0; f < 3; f++) {
 				drawLine(image, cube->faces[i]->vertices[f], cube->faces[i]->vertices[f + 1], 255, false);
 			}
+			drawLine(image, cube->faces[i]->vertices[3], cube->faces[i]->vertices[0], 255, false);
 		}
 	}
 
