@@ -126,6 +126,8 @@ void destroyCube(Cube cube) {
 	free(cube->vertices);
 	free(cube->edges);
 	free(cube->faces);
+	free(cube->size);
+	free(cube->origin);
 
 	free(cube);
 }

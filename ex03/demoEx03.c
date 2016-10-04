@@ -65,17 +65,22 @@ void testSlice(Image* image) {
 	float i = PI / 4;
 	float inc = 0.05;
 	Point3D origin = createPoint3D(image->xsize / 2, image->ysize / 2, image->zsize / 2);
+	Vector3D rotation = NULL;
 	printf("%d %d %d\n", image->xsize, image->ysize, image->zsize);
 
 	for (i = 0; i < 2 * PI; i += inc) {
 		sprintf(name, "out/slice_%f", i);
 
-		Image2D slice = getSlice(origin, createVector3D(i, i, 0), image);
+		rotation = createVector3D(0, i, 0);
+		Image2D slice = getSlice(origin, rotation, image);
 		saveImage(name, slice->img, slice->width, slice->height);
 		freeImage2D(slice);
-	}
-}
+		free(rotation);
 
+		printf("%s done\n", name);
+	}
+
+}
 
 void testMath() {
 	Point3D p, p2, p3, p4, origin;
@@ -91,8 +96,9 @@ void testMath() {
 	printf("scale  (100.0000, 100.0000, 100.0000) %s\n", toStringPoint3D(scale(p, createVector3D(100, 100, 100), false)));
 	printf("relO   (350.0000, 350.0000, 350.0000) %s\n", toStringPoint3D(translate(p, origin, false)));
 	printf("rotX   (350.0000, 250.0000, 391.4214) %s\n", toStringPoint3D(rotateX(p, origin, PI / 4, false)));
-	printf("rotX   (420.7107, 250.0000, 279.2893) %s\n", toStringPoint3D(rotateY(p, origin, PI / 4, false)));
-	printf("rotX   (420.7107, 250.0000, 279.2893) %s\n", toStringPoint3D(rotateY(p, origin, PI / 4, false)));
+	printf("rotY   (420.7107, 250.0000, 279.2893) %s\n", toStringPoint3D(rotateY(p, origin, PI / 4, false)));
+	printf("-rotY  (350.0000, 250.0000, 391.4214) %s\n", toStringPoint3D(rotateY(p, origin, PI / 4, true)));
+	printf("-rotX  (350.0000, 350.0000, 350.0000) %s\n", toStringPoint3D(rotateX(p, origin, PI / 4, true)));
 
 	p = createPoint3D(-1, 1, 1);
 	p2 = createPoint3D(1, 1, 1);
@@ -124,6 +130,16 @@ void testMath() {
 	scale(p2, createVector3D(1.5, 2, 2.5), false);
 	printf("p2     (3.000, 4.000, 5.000) %s\n", toStringPoint3D(p2));
 	printf("f->p2  (3.000, 4.000, 5.000) %s\n", toStringPoint3D(face->vertices[1]));
+
+	free(p);
+	free(p2);
+	free(p3);
+	free(p4);
+	free(v1);
+	free(v2);
+	free(origin);
+	free(normal);
+	free(vertices);
 }
 
 int main(int argc, char* argv[]) {

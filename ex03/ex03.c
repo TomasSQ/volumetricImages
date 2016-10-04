@@ -63,7 +63,7 @@ void drawLineOfSquare(Image2D image, Point3D start, Inc inc, Image* img, Vector3
 	Point3D p = createPoint3D(start->x, start->y, start->z);
 	Point3D aux;
 
-	for (i = 0; i < inc.n; i++) {
+	for (i = 0; i < inc.n * 2; i++) {
 		if (0 <= p->y && p->y < image->height && 0 <= p->x && p->x < image->width) {
 			voxel = (((int) p->z) * img->xsize * img->ysize + ((int) p->y) * img->xsize + ((int) p->x));
 			if (0 > p->z || p->z > img->zsize || 0 > p->y || p->y > img->ysize || 0 > p->x || p->x > img->xsize) {
@@ -74,18 +74,24 @@ void drawLineOfSquare(Image2D image, Point3D start, Inc inc, Image* img, Vector3
 				y = p->y;
 			} else {
 				aux = reverseRotation(p, origin, rotation);
+				// printf("%f\t%f\t\t%f\t%f\n", aux->x, aux->y, p->x, p->y);
 				x = aux->x;
 				y = aux->y;
+				free(aux);
 			}
-			if (0 < x && x < image->width && 0 < y && y < image->height && image->img[y][x] == 0) {
-				image->img[y][x] = voxel > 0 && voxel < img->n ? img->val[voxel] : 0;
+			if (0 < x && x < image->width && 0 < y && y < image->height) {
+				image->img[y][x] = voxel > 0 && voxel < img->n ? img->val[voxel] : 255;
+			} else {
+				// printf("%f\t%f\n", aux->x, aux->y);
 			}
 		}
 
-		p->x += inc.inc->x;
-		p->y += inc.inc->y;
-		p->z += inc.inc->z;
+		p->x += inc.inc->x / 2;
+		p->y += inc.inc->y / 2;
+		p->z += inc.inc->z / 2;
 	}
+
+	free(p);
 }
 
 void drawSquare(Image2D image, Vertices vertices, Image* img, Vector3D reverseRotation, Point3D origin) {
@@ -107,6 +113,9 @@ void drawSquare(Image2D image, Vertices vertices, Image* img, Vector3D reverseRo
 		end->y += inc.inc->y / extraStepsFactor;
 		end->z += inc.inc->z / extraStepsFactor;
 	}
+
+	free(start);
+	free(end);
 }
 
 Image2D render(Vector3D planeRotation, Cube cube, Image* img) {
@@ -134,11 +143,14 @@ Image2D render(Vector3D planeRotation, Cube cube, Image* img) {
 Image2D getSlice(Point3D origin, Vector3D normal, Image* image) {
 	int imageSize = MAX(MAX(image->xsize, image->ysize), image->zsize);
 	Image2D slice = newImage2D(imageSize, imageSize);
+	Vector3D cubeScale = createVector3D(image->xsize, image->ysize, 10);
 
-	Cube cube = createCube(origin, createVector3D(image->xsize, image->ysize, 10));
+	Cube cube = createCube(origin, cubeScale);
 	rotateCube(cube, normal);
 
 	drawSquare(slice, cube->faces[0]->vertices, image, normal, origin);
+
+	destroyCube(cube);
 
 	return slice;
 }
