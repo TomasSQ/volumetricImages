@@ -2,6 +2,8 @@
 
 #include "ex03.h"
 
+#define EXTRA_STEP_FACTOR 2
+
 typedef struct {
 	Point3D inc;
 	int n;
@@ -63,7 +65,7 @@ void drawLineOfSquare(Image2D image, Point3D start, Inc inc, Image* img, Vector3
 	Point3D p = createPoint3D(start->x, start->y, start->z);
 	Point3D aux;
 
-	for (i = 0; i < inc.n * 2; i++) {
+	for (i = 0; i < inc.n * EXTRA_STEP_FACTOR; i++) {
 		if (0 <= p->y && p->y < image->height && 0 <= p->x && p->x < image->width) {
 			voxel = (((int) p->z) * img->xsize * img->ysize + ((int) p->y) * img->xsize + ((int) p->x));
 			if (0 > p->z || p->z > img->zsize || 0 > p->y || p->y > img->ysize || 0 > p->x || p->x > img->xsize) {
@@ -74,21 +76,18 @@ void drawLineOfSquare(Image2D image, Point3D start, Inc inc, Image* img, Vector3
 				y = p->y;
 			} else {
 				aux = reverseRotation(p, origin, rotation);
-				// printf("%f\t%f\t\t%f\t%f\n", aux->x, aux->y, p->x, p->y);
 				x = aux->x;
 				y = aux->y;
 				free(aux);
 			}
 			if (0 < x && x < image->width && 0 < y && y < image->height) {
-				image->img[y][x] = voxel > 0 && voxel < img->n ? img->val[voxel] : 255;
-			} else {
-				// printf("%f\t%f\n", aux->x, aux->y);
+				image->img[y][x] = voxel > 0 && voxel < img->n ? img->val[voxel] : 0;
 			}
 		}
 
-		p->x += inc.inc->x / 2;
-		p->y += inc.inc->y / 2;
-		p->z += inc.inc->z / 2;
+		p->x += inc.inc->x / EXTRA_STEP_FACTOR;
+		p->y += inc.inc->y / EXTRA_STEP_FACTOR;
+		p->z += inc.inc->z / EXTRA_STEP_FACTOR;
 	}
 
 	free(p);
@@ -98,20 +97,19 @@ void drawSquare(Image2D image, Vertices vertices, Image* img, Vector3D reverseRo
 	Vertex start, end;
 	Inc inc;
 	int i;
-	float extraStepsFactor = 10;
 
 	inc = getInc(vertices[0], vertices[3], false);
 	start = copy(createPoint3D(0, 0, 0), vertices[0]);
 	end = copy(createPoint3D(0, 0, 0), vertices[1]);
 
-	for (i = 0; i < inc.n * extraStepsFactor; i++) {
+	for (i = 0; i < inc.n * EXTRA_STEP_FACTOR; i++) {
 		drawLineOfSquare(image, start, getInc(start, end, false), img, reverseRotation, origin);
-		start->x += inc.inc->x / extraStepsFactor;
-		start->y += inc.inc->y / extraStepsFactor;
-		start->z += inc.inc->z / extraStepsFactor;
-		end->x += inc.inc->x / extraStepsFactor;
-		end->y += inc.inc->y / extraStepsFactor;
-		end->z += inc.inc->z / extraStepsFactor;
+		start->x += inc.inc->x / EXTRA_STEP_FACTOR;
+		start->y += inc.inc->y / EXTRA_STEP_FACTOR;
+		start->z += inc.inc->z / EXTRA_STEP_FACTOR;
+		end->x += inc.inc->x / EXTRA_STEP_FACTOR;
+		end->y += inc.inc->y / EXTRA_STEP_FACTOR;
+		end->z += inc.inc->z / EXTRA_STEP_FACTOR;
 	}
 
 	free(start);
@@ -144,11 +142,12 @@ Image2D getSlice(Point3D origin, Vector3D normal, Image* image) {
 	int imageSize = MAX(MAX(image->xsize, image->ysize), image->zsize);
 	Image2D slice = newImage2D(imageSize, imageSize);
 	Vector3D cubeScale = createVector3D(image->xsize, image->ysize, 10);
+	Vector3D rotation = NULL;
 
 	Cube cube = createCube(origin, cubeScale);
-	rotateCube(cube, normal);
+	rotation = alignCube(cube, normal);
 
-	drawSquare(slice, cube->faces[0]->vertices, image, normal, origin);
+	drawSquare(slice, cube->faces[0]->vertices, image, rotation, origin);
 
 	destroyCube(cube);
 

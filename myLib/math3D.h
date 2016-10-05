@@ -46,6 +46,9 @@ Point3D scale(Point3D p, Vector3D factor, bool inverse);
 Point3D rotateZ(Point3D p, Point3D origin, float theta, bool inverse);
 Point3D rotateY(Point3D p, Point3D origin, float theta, bool inverse);
 Point3D rotateX(Point3D p, Point3D origin, float theta, bool inverse);
+Point3D rotate(Point3D p, Point3D origin, Vector3D rotation, float theta, bool inverse);
+
+float angleBetweenVectors(Vector3D a, Vector3D b);
 
 float innerProduct(Vector3D a, Vector3D b);
 float moduleOfVector3D(Vector3D a);

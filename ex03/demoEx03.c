@@ -62,24 +62,26 @@ void testCube(Image* image) {
 
 void testSlice(Image* image) {
 	char name[200];
-	float i = PI / 4;
+	float i = 0;//PI / 4;
 	float inc = 0.05;
+	float xinc = 1 * (1 * inc);
+	float yinc = 1 * (3 * inc);
+	float zinc = 1 * (1 * inc);
 	Point3D origin = createPoint3D(image->xsize / 2, image->ysize / 2, image->zsize / 2);
-	Vector3D rotation = NULL;
+	Vector3D normal = createVector3D(0, 0, -1);
 	printf("%d %d %d\n", image->xsize, image->ysize, image->zsize);
 
 	for (i = 0; i < 2 * PI; i += inc) {
 		sprintf(name, "out/slice_%f", i);
 
-		rotation = createVector3D(0, i, 0);
-		Image2D slice = getSlice(origin, rotation, image);
+		normal = normalizedVector3D(rotateZ(rotateY(rotateX(normal, NULL, xinc, false), NULL, yinc, false), NULL, zinc, false));
+		Image2D slice = getSlice(origin, normal, image);
 		saveImage(name, slice->img, slice->width, slice->height);
 		freeImage2D(slice);
-		free(rotation);
 
 		printf("%s done\n", name);
 	}
-
+	free(normal);
 }
 
 void testMath() {
