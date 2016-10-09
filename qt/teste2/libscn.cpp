@@ -27,14 +27,14 @@
 
 /* Non-image related utils */
 namespace Util{
-	std::string padded_num(int n,int pad){
+    inline std::string padded_num(int n,int pad){
 		std::ostringstream ss;
 		ss<<std::setw(pad)<<std::setfill('0')<<n;
 		std::string ret=ss.str();
 		if(ret.length()>pad){ret.erase(0,ret.length()-pad);}
 		return ret;
-	}
-	void sys(const std::string&cmd){
+    }
+    inline void sys(const std::string&cmd){
 		if(std::system(cmd.c_str()))
 			std::cerr<<"Error: "<<cmd<<std::endl;
 	}
@@ -48,7 +48,7 @@ namespace ColorSpace{
 	typedef std::tuple<rat,rat,rat> t3r;
 
 	/*         [0,360), [0,1] ,  [0,1]  */
-	t3r HSL2RGB(double H,double S,double L){
+    inline t3r HSL2RGB(double H,double S,double L){
 		/*__ R-y-G-c-B-m-R */
 		/*Hl 0-1-2-3-4-5-6 */
 		/* X 0-1-0-1-0-1-0 */
@@ -78,9 +78,9 @@ namespace ColorSpace{
 
 	namespace WTP{
 		//int [((1)<<(1*8))*(8-1)+3][3];
-		const int MAX=1792;
-		int T[1800][3];bool v(0);
-		void init(){if(v)return;
+        const int MAX=1792;
+        int T[1800][3];bool v(0);
+        inline void init(){if(v)return;
 			int t=0,i=0;int r=0,g=0,b=0;
 			// change to do-while
 			for(i=0;i<256;++i,++r,    ++b){T[t][0]=r;T[t][1]=g;T[t][2]=b;++t;}--r;    --b;
@@ -94,7 +94,7 @@ namespace ColorSpace{
 			v=true;
 		}
 		/*        [0.0 ,1.0]*/
-		t3n GS2RGB(double gs){
+        inline t3n GS2RGB(double gs){
 			if(!v){init();}
 			if(gs>1)gs=1;
 			int t=gs*(MAX-1);
@@ -108,27 +108,27 @@ namespace ColorSpace{
 /* Class to store Voxel values */
 class Voxel{public:
 	std::vector<std::vector<std::bitset<8> > >value;
-	auto num_channels()const{return value.size();}
-	auto num_bytes()   const{return value.empty()?0:value[0].size();}
-	auto to_ullong(int ic=0)const{unsigned long long ret(0);int ib(0);
+    inline auto num_channels()const{return value.size();}
+    inline auto num_bytes()   const{return value.empty()?0:value[0].size();}
+    inline auto to_ullong(int ic=0)const{unsigned long long ret(0);int ib(0);
 		for(auto const &b:value[ic])ret+=(b.to_ullong()<<((ib++)*8));
 		return ret;
 	}
-	auto to_ulong(int ic=0)const{unsigned long ret(0);int ib(0);
+    inline auto to_ulong(int ic=0)const{unsigned long ret(0);int ib(0);
 		for(auto const &b:value[ic])ret+=(b.to_ulong()<<((ib++)*8));
         return ret;
 	}
-	bool operator==(const Voxel& rhs)const{return value==rhs.value;}
-	bool operator!=(const Voxel& rhs)const{return !(value==rhs.value);}
+    inline bool operator==(const Voxel& rhs)const{return value==rhs.value;}
+    inline bool operator!=(const Voxel& rhs)const{return !(value==rhs.value);}
 
-	bool operator <(const Voxel& rhs)const{return to_ulong() <rhs.to_ulong();}
-	bool operator >(const Voxel& rhs)const{return to_ulong() >rhs.to_ulong();}
-	bool operator<=(const Voxel& rhs)const{return to_ulong()<=rhs.to_ulong();}
-	bool operator>=(const Voxel& rhs)const{return to_ulong()>=rhs.to_ulong();}
+    inline bool operator <(const Voxel& rhs)const{return to_ulong() <rhs.to_ulong();}
+    inline bool operator >(const Voxel& rhs)const{return to_ulong() >rhs.to_ulong();}
+    inline bool operator<=(const Voxel& rhs)const{return to_ulong()<=rhs.to_ulong();}
+    inline bool operator>=(const Voxel& rhs)const{return to_ulong()>=rhs.to_ulong();}
 
-	void set(const std::vector<std::vector<std::bitset<8> > >&new_value){value=new_value;}
+    inline void set(const std::vector<std::vector<std::bitset<8> > >&new_value){value=new_value;}
 };
-std::ostream&operator<<(std::ostream&os,Voxel const&v){return os<<v.value;}
+inline std::ostream&operator<<(std::ostream&os,Voxel const&v){return os<<v.value;}
 
 /* Class that stores image metadata */
 class MetaData{public:
@@ -143,7 +143,7 @@ class MetaData{public:
 namespace VoxelMap{
 	using t3i=std::tuple<int,int,int>;
 	using t3d=std::tuple<double,double,double>;
-	int transform(const Voxel&v){
+    inline int transform(const Voxel&v){
 		/* average all channels */
 		int ret=0;
 		for(int ic=0;ic<v.num_channels();++ic)
@@ -151,7 +151,7 @@ namespace VoxelMap{
 		ret/=v.num_channels();
 		return ret;
 	}
-	Voxel transform(int i){
+    inline Voxel transform(int i){
 		Voxel ret;
 		ret.value.resize(1);//only 1 channel
 		do{
@@ -161,7 +161,7 @@ namespace VoxelMap{
 		return ret;
 	}
 
-	Voxel transform(const t3i&rgb){
+    inline Voxel transform(const t3i&rgb){
 		Voxel ret;
 		ret.value.resize(3);
 		ret.value[0].push_back(std::bitset<8>(std::get<0>(rgb)));
@@ -169,7 +169,7 @@ namespace VoxelMap{
 		ret.value[2].push_back(std::bitset<8>(std::get<2>(rgb)));
 		return ret;
 	}
-	Voxel transform(const t3d&rgb){
+    inline Voxel transform(const t3d&rgb){
 		int r = 255*(std::get<0>(rgb));
 		int g = 255*(std::get<1>(rgb));
 		int b = 255*(std::get<2>(rgb));
@@ -185,27 +185,27 @@ class Image3D{
 	int n[3];int n3;
 	MetaData md;
 
-	int get_n(int d)const{return n[d];}
+    inline int get_n(int d)const{return n[d];}
 
-	Voxel& ref(int x,int y,int z){return data[x][y][z];}
-	Voxel& ref(const t3i&t){return ref(std::get<0>(t),std::get<1>(t),std::get<2>(t));}
+    inline Voxel& ref(int x,int y,int z){return data[x][y][z];}
+    inline Voxel& ref(const t3i&t){return ref(std::get<0>(t),std::get<1>(t),std::get<2>(t));}
 
-	const Voxel& cref(int x,int y,int z)const{return data[x][y][z];}
-	const Voxel& cref(const t3i&t)const{return cref(std::get<0>(t),std::get<1>(t),std::get<2>(t));}
+    inline const Voxel& cref(int x,int y,int z)const{return data[x][y][z];}
+    inline const Voxel& cref(const t3i&t)const{return cref(std::get<0>(t),std::get<1>(t),std::get<2>(t));}
 
-	Voxel& operator[](const t3i&t){return ref(t);}
-	Voxel& operator[](std::size_t idx){return ref(pos(idx));}
+    inline Voxel& operator[](const t3i&t){return ref(t);}
+    inline Voxel& operator[](std::size_t idx){return ref(pos(idx));}
 
-	const Voxel& operator[](const t3i&t)const{return cref(t);}
-	const Voxel& operator[](std::size_t idx)const{return cref(pos(idx));}
+    inline const Voxel& operator[](const t3i&t)const{return cref(t);}
+    inline const Voxel& operator[](std::size_t idx)const{return cref(pos(idx));}
 
-	Voxel get(int x,int y,int z)const{return data[x][y][z];}
-	Voxel get(const t3i&t)const{return  get(std::get<0>(t),std::get<1>(t),std::get<2>(t));}
+    inline Voxel get(int x,int y,int z)const{return data[x][y][z];}
+    inline Voxel get(const t3i&t)const{return  get(std::get<0>(t),std::get<1>(t),std::get<2>(t));}
 
-	void set(int x,int y,int z,const Voxel&v){data[x][y][z]=v;}
-	void set(const t3i&t,const Voxel&v){set(std::get<0>(t),std::get<1>(t),std::get<2>(t),v);}
+    inline void set(int x,int y,int z,const Voxel&v){data[x][y][z]=v;}
+    inline void set(const t3i&t,const Voxel&v){set(std::get<0>(t),std::get<1>(t),std::get<2>(t),v);}
 
-	t3i pos(std::size_t idx)const{
+    inline t3i pos(std::size_t idx)const{
 		int x,y,z;
 		z = idx/(n[0]*n[1]);
 		idx -= (z*n[0]*n[1]);
@@ -213,10 +213,10 @@ class Image3D{
 		x = idx % n[0];
 		return t3i(x,y,z);
 	}
-	int pos(int p0,int p1,int p2)const{return (p2*n[0]*n[1])+(p1*n[0])+p0;}
-	int pos(const t3i& t)const{return pos(std::get<0>(t),std::get<1>(t),std::get<2>(t));}
+    inline int pos(int p0,int p1,int p2)const{return (p2*n[0]*n[1])+(p1*n[0])+p0;}
+    inline int pos(const t3i& t)const{return pos(std::get<0>(t),std::get<1>(t),std::get<2>(t));}
 
-	t3i pos(int a0,int p0,int a1,int p1,int a2,int p2)const{
+    inline t3i pos(int a0,int p0,int a1,int p1,int a2,int p2)const{
 		t3i ret;
 		std::get<0>(ret) = a0!=0?a1!=0?p2:p1:p0;
 		std::get<1>(ret) = a0!=1?a1!=1?p2:p1:p0;
@@ -226,7 +226,7 @@ class Image3D{
 
 	/* Extract orthogonal plane determined by {a_,p_.aX,sX,sY} to ret[_][_][0] */
 	/*TRF-1*/
-	void ort_plane(Image3D&ret,int a_=0,int p_=-1,int aX=0,int sX=1,int sY=1)const{
+    inline void ort_plane(Image3D&ret,int a_=0,int p_=-1,int aX=0,int sX=1,int sY=1)const{
 		/* Parameter remapping */
 		int axis	= a_;			// [0,1,2]	->	[0,1,2]
 		int plane	= p_<0? n[a_]/2 : p_;
@@ -265,12 +265,12 @@ class Image3D{
 		return;
 	}
 
-	void map(std::function<void(Voxel&)>f){
+    inline void map(std::function<void(Voxel&)>f){
 		for(int iv=0;iv<n3;++iv)f(ref(pos(iv)));
 	}
 
 	template<class Compare>
-	Voxel top(Compare comp)const{
+    inline Voxel top(Compare comp)const{
 		const Voxel*ret=&cref(pos(0));
 		//for(int iv=0;iv<n3;++iv){if(comp(*ret,(cref(pos(iv)))))ret=&cref(pos(iv));}
 		/*
@@ -287,7 +287,7 @@ class Image3D{
 	}
 
 	/*TRF-2*/
-	void linear_transform(int I1,int I2,int k1,int k2){
+    inline void linear_transform(int I1,int I2,int k1,int k2){
 		int k;int I;
 		int kd = (k2-k1);
 		int Id = (I2-I1);if(Id==0)Id=1;
@@ -301,7 +301,7 @@ class Image3D{
 	}
 
 	/*TRF-3*/
-	void colorize(const Image3D&label){
+    inline void colorize(const Image3D&label){
 		Voxel l_max = label.top(std::less<Voxel>());
 		Voxel v_min = top(std::greater<Voxel>());
 		Voxel v_max = top(std::less<Voxel>());
@@ -332,7 +332,7 @@ class Image3D{
 		}
 	}
 
-	void apply_pallete(){
+    inline void apply_pallete(){
 		int x_min = top(std::greater<Voxel>()).to_ulong();
 		int x_max = top(std::less   <Voxel>()).to_ulong();
 		double x_d = (x_max-x_min);
@@ -353,7 +353,7 @@ namespace ImgFormat{
 
 	namespace PPM{
 		enum class Color{cR,cG,cB};
-		void read(Image3D&img,const std::string& path){
+        inline void read(Image3D&img,const std::string& path){
 			std::ifstream ifs;ifs.open(path.c_str(),std::ifstream::in);
 			/* read magic string */
 			ifs>>img.md.mgc;
@@ -381,7 +381,7 @@ namespace ImgFormat{
 			}
 			ifs.close();
 		}
-		void write(/*const*/ Image3D&img,const std::string& path){
+        inline void write(/*const*/ Image3D&img,const std::string& path){
 			std::ofstream ofs;ofs.open(path.c_str(),std::ofstream::out);
 			/* write magic string */
 			if(img.md.mgc.empty())img.md.mgc="P6";
@@ -407,7 +407,7 @@ namespace ImgFormat{
 	}
 
 	namespace SCN{
-		void read(Image3D&img,const std::string& path){
+        inline void read(Image3D&img,const std::string& path){
 			std::ifstream ifs;ifs.open(path.c_str(),std::ifstream::in);
 			/* read magic string */
 			ifs>>img.md.mgc;
@@ -434,7 +434,7 @@ namespace ImgFormat{
 			}
 			ifs.close();
 		}
-		void write(/*const*/ Image3D&img,const std::string& path){
+        inline void write(/*const*/ Image3D&img,const std::string& path){
 			std::ofstream ofs;ofs.open(path.c_str(),std::ofstream::out);
 			/* write magic string */
 			if(img.md.mgc.empty())img.md.mgc="SCN";
@@ -460,7 +460,7 @@ namespace ImgFormat{
 	}
 
 	namespace detect{
-		void read(Image3D&img,const std::string& path){
+        inline void read(Image3D&img,const std::string& path){
 			std::ifstream ifs;ifs.open(path.c_str(),std::ifstream::in);
 			/* read magic string */
 			std::string mgc;ifs>>mgc;ifs.close();
@@ -469,7 +469,7 @@ namespace ImgFormat{
 			else{std::cerr<<"Error: not able to detect file."<<std::endl;return;}
 
 		}
-		void write(/*const*/ Image3D&img,const std::string& path){
+        inline void write(/*const*/ Image3D&img,const std::string& path){
 			std::string ext(path.substr(path.size()-4));for(auto &e:ext){e=toupper(e);}
 			     if(ext==".PPM"){PPM::write(img,path);}
 			else if(ext==".SCN"){SCN::write(img,path);}
@@ -478,8 +478,8 @@ namespace ImgFormat{
 	}
 
 	namespace TMP{
-		void read(const Image3D&img,const std::string& path){}
-		void write(const Image3D&img,const std::string& path){}
+        inline void read(const Image3D&img,const std::string& path){}
+        inline void write(const Image3D&img,const std::string& path){}
 	}
 
 }
@@ -487,7 +487,7 @@ namespace ImgFormat{
 /* Conversion using imagemagick */
 namespace ImageMagick{
 	/* convert "path" to "path.format" */
-	void convert(const std::string& path,const std::string& format="png"){
+    inline void convert(const std::string& path,const std::string& format="png"){
 		std::string cmd;
 		cmd="convert "+path+" "+path+"."+format+" ;";
 		Util::sys(cmd);
@@ -495,7 +495,7 @@ namespace ImageMagick{
 		Util::sys(cmd);
 	}
 	/* animate files in "in_dir" to "out_path.gif" */
-	void animate(const std::string& in_dir,const std::string& out_path){
+    inline void animate(const std::string& in_dir,const std::string& out_path){
 		std::string cmd;
 		int delay=4;/*s/100*/
 		cmd="convert -delay "+std::to_string(delay)+" -loop 0 "+in_dir+"/* "+out_path+".gif ;";
@@ -507,9 +507,9 @@ namespace ImageMagick{
 
 /* Quick demo procedures */
 namespace ImgMacro{
-	std::string pfx;
+    std::string pfx;
 
-	void init(){
+    inline void init(){
 		pfx="/tmp/mob/";
 		std::string cmd;
 		cmd="mkdir -p "+pfx+"/png/ ;";Util::sys(cmd);
@@ -517,7 +517,7 @@ namespace ImgMacro{
 		cmd="mkdir -p "+pfx+"/gif/ ;";Util::sys(cmd);
 	}
 
-	void ort_animate(const Image3D&img,const std::string& out_path,int a_=0,int aX=0,int sX=1,int sY=1){
+    inline void ort_animate(const Image3D&img,const std::string& out_path,int a_=0,int aX=0,int sX=1,int sY=1){
 		std::string cmd;
 		cmd="mkdir -p "+pfx+"/tmp/ ;";
 		Util::sys(cmd);

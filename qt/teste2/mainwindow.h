@@ -6,6 +6,7 @@
 
 
 
+
 namespace Ui {
 class MainWindow;
 }
@@ -17,14 +18,19 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void fill_with_slides(void*, float percent = -1);
 
 
-private slots:
+public slots:
     void on_horizontalSlider_valueChanged(int value);
+    void on_openAction(bool);
+    void on_radio_linear_toogle(bool);
+    void on_horizontalSlider_transformationsB_valueChanged(int);
+    void on_horizontalSlider_transformationsA_valueChanged(int);
 
 private:
     Ui::MainWindow *ui;
-    QGraphicsScene *scene;
+    QGraphicsScene *scene,*scene2,*scene3;
     QPixmap pix;
 
 
