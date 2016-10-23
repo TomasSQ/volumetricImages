@@ -15,9 +15,15 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    libscn.cpp
+    libscn.cpp \
+    libscnqt.cpp \
+    colorizedialog.cpp
 
 HEADERS  += mainwindow.h \
-    prettyprint.hpp
+    prettyprint.hpp \
+    libscn.hpp \
+    libscnqt.h \
+    colorizedialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    colorizedialog.ui
