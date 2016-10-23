@@ -21,6 +21,12 @@ Point3D project(Vector3D planeRotation, Point3D p, int D) {
 	return p;
 }
 
+float angleBetweenVectors(Vector3D a, Vector3D b) {
+	float modules = moduleOfVector3D(a) * moduleOfVector3D(b);
+
+	return modules > 0.00001 || modules < -0.0001 ? acos(innerProduct(a, b) / modules) : 0;
+}
+
 Vector3D vectorProduct(Vector3D a, Vector3D b) {
 	return createVector3D(
 		a->y * b->z - a->z * b->y,
@@ -77,6 +83,9 @@ Vector3D normalizedVector3D(Vector3D a) {
 }
 
 Point3D translate(Point3D p, Vector3D inc, bool inverse) {
+	if (inc == NULL) {
+		return p;
+	}
 	p->x += (inverse ? -1.0 : 1.0) * inc->x,
 	p->y += (inverse ? -1.0 : 1.0) * inc->y,
 	p->z += (inverse ? -1.0 : 1.0) * inc->z;
@@ -135,6 +144,20 @@ Point3D rotateX(Point3D p, Point3D origin, float theta, bool inverse) {
 	translate(q, origin, false);
 
 	return copy(p, q);
+}
+
+Point3D rotate(Point3D p, Point3D origin, Vector3D rotation, float theta, bool inverse) {
+	float thetaX = atan(rotation->y / rotation->z);
+	float thetaY = atan(rotation->x / cos(thetaX));
+	float thetaZ = theta;
+
+	rotateX(p, origin, thetaX, false);
+	rotateY(p, origin, thetaY, false);
+	rotateZ(p, origin, thetaZ, false);
+	rotateY(p, origin, thetaY, true);
+	rotateX(p, origin, thetaX, true);
+
+	return p;
 }
 
 bool samePoint(Point3D a, Point3D b) {

@@ -38,6 +38,48 @@ Cube rotateCube(Cube cube, Vector3D rotation) {
 	return cube;
 }
 
+Vector3D alignCube(Cube cube, Vector3D normal) {
+	int i;
+	float rotationX, rotationY, rotationZ;
+
+	Vector3D aux1 = copy(createVector3D(0, 0, 0), normal);
+	Vector3D aux2 = copy(createVector3D(0, 0, 0), cube->faces[0]->normal);
+	aux1->x = 0;
+	aux2->x = 0;
+	rotationX = angleBetweenVectors(aux1, aux2);
+
+	aux1 = copy(aux1, normal);
+	aux2 = copy(aux2, cube->faces[0]->normal);
+	aux1->y = 0;
+	aux2->y = 0;
+	rotationY = angleBetweenVectors(aux1, aux2);
+
+	aux1 = copy(aux1, normal);
+	aux2 = copy(aux2, cube->faces[0]->normal);
+	aux1->z = 0;
+	aux2->z = 0;
+	rotationZ = angleBetweenVectors(aux1, aux2);
+
+	for (i = 0; i < cube->nVertices; i++) {
+		if (rotationX) {
+			rotateX(cube->vertices[i], cube->origin, rotationX, false);
+		}
+		if (rotationY) {
+			rotateY(cube->vertices[i], cube->origin, rotationY, false);
+		}
+		if (rotationZ) {
+			rotateZ(cube->vertices[i], cube->origin, rotationZ, false);
+		}
+	}
+
+	updateCube(cube);
+
+	free(aux1);
+	free(aux2);
+
+	return createVector3D(rotationX, rotationY, rotationZ);
+}
+
 void defineVertices(Cube cube) {
 	int vertex;
 	int vertexMap[8][3] = {
@@ -126,6 +168,8 @@ void destroyCube(Cube cube) {
 	free(cube->vertices);
 	free(cube->edges);
 	free(cube->faces);
+	free(cube->size);
+	free(cube->origin);
 
 	free(cube);
 }
