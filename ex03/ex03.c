@@ -5,7 +5,9 @@
 #define EXTRA_STEP_FACTOR 2
 
 typedef struct {
-	Point3D inc;
+	float x;
+	float y;
+	float z;
 	int n;
 } Inc;
 
@@ -14,7 +16,9 @@ Inc getInc(Point3D start, Point3D end, bool ignoreZ) {
 
 	Inc inc;
 	inc.n = 0;
-	inc.inc = createPoint3D(0, 0, 0);
+	inc.x = 0;
+	inc.y = 0;
+	inc.z = 0;
 
 	if (samePoint(start, end)) {
 		return inc;
@@ -26,19 +30,19 @@ Inc getInc(Point3D start, Point3D end, bool ignoreZ) {
 
 	if (ABS(deltaX) >= ABS(deltaY) && (ignoreZ || ABS(deltaX) >= ABS(deltaZ))) {
 		inc.n = ABS(deltaX) + 1;
-		inc.inc->x = SIGN(deltaX);
-		inc.inc->y = inc.inc->x * deltaY / deltaX;
-		inc.inc->z = inc.inc->x * deltaZ / deltaX;
+		inc.x = SIGN(deltaX);
+		inc.y = inc.x * deltaY / deltaX;
+		inc.z = inc.x * deltaZ / deltaX;
 	} else if (ABS(deltaY) >= ABS(deltaX) && (ignoreZ || ABS(deltaY) >= ABS(deltaZ))) {
 		inc.n = ABS(deltaY) + 1;
-		inc.inc->y = SIGN(deltaY);
-		inc.inc->x = inc.inc->y * deltaX / deltaY;
-		inc.inc->z = inc.inc->y * deltaZ / deltaY;
+		inc.y = SIGN(deltaY);
+		inc.x = inc.y * deltaX / deltaY;
+		inc.z = inc.y * deltaZ / deltaY;
 	} else if (!ignoreZ) {
 		inc.n = ABS(deltaZ) + 1;
-		inc.inc->z = SIGN(deltaZ);
-		inc.inc->x = inc.inc->z * deltaX / deltaZ;
-		inc.inc->y = inc.inc->z * deltaY / deltaZ;
+		inc.z = SIGN(deltaZ);
+		inc.x = inc.z * deltaX / deltaZ;
+		inc.y = inc.z * deltaY / deltaZ;
 	}
 
 	return inc;
@@ -67,9 +71,13 @@ void drawLineOfSquare(Image2D image, Point3D start, Inc inc, Image* img, Vector3
 
 	for (i = 0; i < inc.n * EXTRA_STEP_FACTOR; i++) {
 		if (0 <= p->y && p->y < image->height && 0 <= p->x && p->x < image->width) {
-			voxel = (((int) p->z) * img->xsize * img->ysize + ((int) p->y) * img->xsize + ((int) p->x));
-			if (0 > p->z || p->z > img->zsize || 0 > p->y || p->y > img->ysize || 0 > p->x || p->x > img->xsize) {
-				voxel = img->n + 1;
+			if (img != NULL) {
+				voxel = (((int) p->z) * img->xsize * img->ysize + ((int) p->y) * img->xsize + ((int) p->x));
+				if (0 > p->z || p->z > img->zsize || 0 > p->y || p->y > img->ysize || 0 > p->x || p->x > img->xsize) {
+					voxel = img->n + 1;
+				}
+			} else {
+				voxel = -1;
 			}
 			if (rotation == NULL) {
 				x = p->x;
@@ -85,9 +93,9 @@ void drawLineOfSquare(Image2D image, Point3D start, Inc inc, Image* img, Vector3
 			}
 		}
 
-		p->x += inc.inc->x / EXTRA_STEP_FACTOR;
-		p->y += inc.inc->y / EXTRA_STEP_FACTOR;
-		p->z += inc.inc->z / EXTRA_STEP_FACTOR;
+		p->x += inc.x / EXTRA_STEP_FACTOR;
+		p->y += inc.y / EXTRA_STEP_FACTOR;
+		p->z += inc.z / EXTRA_STEP_FACTOR;
 	}
 
 	free(p);
@@ -104,12 +112,12 @@ void drawSquare(Image2D image, Vertices vertices, Image* img, Vector3D reverseRo
 
 	for (i = 0; i < inc.n * EXTRA_STEP_FACTOR; i++) {
 		drawLineOfSquare(image, start, getInc(start, end, false), img, reverseRotation, origin);
-		start->x += inc.inc->x / EXTRA_STEP_FACTOR;
-		start->y += inc.inc->y / EXTRA_STEP_FACTOR;
-		start->z += inc.inc->z / EXTRA_STEP_FACTOR;
-		end->x += inc.inc->x / EXTRA_STEP_FACTOR;
-		end->y += inc.inc->y / EXTRA_STEP_FACTOR;
-		end->z += inc.inc->z / EXTRA_STEP_FACTOR;
+		start->x += inc.x / EXTRA_STEP_FACTOR;
+		start->y += inc.y / EXTRA_STEP_FACTOR;
+		start->z += inc.z / EXTRA_STEP_FACTOR;
+		end->x += inc.x / EXTRA_STEP_FACTOR;
+		end->y += inc.y / EXTRA_STEP_FACTOR;
+		end->z += inc.z / EXTRA_STEP_FACTOR;
 	}
 
 	free(start);
@@ -122,7 +130,7 @@ Image2D render(Vector3D planeRotation, Cube cube, Image* img) {
 
 	visibleFaces(planeRotation, cube->faces, visible, 6);
 
-	Image2D image = newImage2D(img->xsize, img->ysize);
+	Image2D image = img == NULL ? newImage2D(200, 200) : newImage2D(img->xsize, img->ysize);
 	for (i = 0; i < 6; i++) {
 		if (visible[i]) {
 			drawSquare(image, cube->faces[i]->vertices, img, NULL, NULL);
@@ -136,22 +144,6 @@ Image2D render(Vector3D planeRotation, Cube cube, Image* img) {
 	free(visible);
 
 	return image;
-}
-
-Image2D getSlice(Point3D origin, Vector3D normal, Image* image) {
-	int imageSize = MAX(MAX(image->xsize, image->ysize), image->zsize);
-	Image2D slice = newImage2D(imageSize, imageSize);
-	Vector3D cubeScale = createVector3D(image->xsize, image->ysize, 10);
-	Vector3D rotation = NULL;
-
-	Cube cube = createCube(origin, cubeScale);
-	rotation = alignCube(cube, normal);
-
-	drawSquare(slice, cube->faces[0]->vertices, image, rotation, origin);
-
-	destroyCube(cube);
-
-	return slice;
 }
 
 void visibleFaces(Vector3D planeRotation, Face* faces, bool* visibleFaces, int nFaces) {
@@ -173,9 +165,9 @@ void draw(Image2D image, Point3D start, Inc inc, int intensity) {
 			image->img[(int) p->y][(int) p->x] = intensity;
 		}
 
-		p->x += inc.inc->x;
-		p->y += inc.inc->y;
-		p->z += inc.inc->z;
+		p->x += inc.x;
+		p->y += inc.y;
+		p->z += inc.z;
 	}
 }
 
