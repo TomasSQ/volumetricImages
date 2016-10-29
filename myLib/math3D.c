@@ -126,7 +126,9 @@ Point3D rotateZ(Point3D p, Point3D origin, float theta, bool inverse) {
 
 	translate(q, origin, false);
 
-	return copy(p, q);
+	copy(p, q);
+	free(q);
+	return p;
 }
 
 Point3D rotateY(Point3D p, Point3D origin, float theta, bool inverse) {
@@ -141,7 +143,9 @@ Point3D rotateY(Point3D p, Point3D origin, float theta, bool inverse) {
 
 	translate(q, origin, false);
 
-	return copy(p, q);
+	copy(p, q);
+	free(q);
+	return p;
 }
 
 Point3D rotateX(Point3D p, Point3D origin, float theta, bool inverse) {
@@ -156,7 +160,9 @@ Point3D rotateX(Point3D p, Point3D origin, float theta, bool inverse) {
 
 	translate(q, origin, false);
 
-	return copy(p, q);
+	copy(p, q);
+	free(q);
+	return p;
 }
 
 Point3D rotate(Point3D p, Point3D origin, Vector3D rotation, float theta, bool inverse) {

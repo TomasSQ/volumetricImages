@@ -178,6 +178,8 @@ void destroyCube(Cube cube) {
 	free(cube->edges);
 
 	for (i = 0; i < cube->nFaces; i++) {
+		free(cube->faces[i]->normal);
+		free(cube->faces[i]->vertices);
 		free(cube->faces[i]);
 	}
 	free(cube->faces);

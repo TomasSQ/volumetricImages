@@ -30,8 +30,10 @@ void testSlice(Image* image) {
 }
 
 int main(int argc, char* argv[]) {
+	int initialMemDin = initMemDinMonitoring();
 	testSlice(ReadImage(argv[2]));
 	system("convert -delay 0 -loop 0 out/slice_*.pgm ~/Desktop/slice.gif");
+	checkMemDinMonitoring(initialMemDin);
 
 	return 0;
 }

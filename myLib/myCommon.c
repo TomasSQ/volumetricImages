@@ -107,3 +107,18 @@ void freeColoredImage2D(Image2D img) {
 
 	free(img);
 }
+
+int initMemDinMonitoring() {
+	free(malloc(1));
+
+	return mallinfo().uordblks;
+}
+
+int checkMemDinMonitoring(int initialMemDin) {
+	int finalMemDin = mallinfo().uordblks;
+	if (initialMemDin != finalMemDin) {
+		printf("\n\nDinamic memory was not completely deallocated %d (%d, %d)\n", finalMemDin - initialMemDin, initialMemDin, finalMemDin);
+	}
+
+	return finalMemDin - initialMemDin;
+}

@@ -35,4 +35,7 @@ range getRange(int **img, int imageWidth, int imageHeight);
 float SIN(float theta);
 float COS(float theta);
 
+int initMemDinMonitoring();
+int checkMemDinMonitoring(int initialMemDin);
+
 #endif
