@@ -38,11 +38,10 @@ void testCube(Image* image) {
 	float i = PI / 4;
 	float inc = 0.05;
 	int sign;
-	Point3D origin = createPoint3D(image->xsize / 2, image->ysize / 2, image->zsize / 2);
+	Point3D origin = image == NULL ? createPoint3D(100, 100, 100) : createPoint3D(image->xsize / 2, image->ysize / 2, image->zsize / 2);
 	Vector3D planeRotation = NULL;
 	Vector3D scaleFactor = NULL;
 	Cube cube = createCube(origin, createVector3D(50, 50, 50));
-	printf("%d %d %d\n", image->xsize, image->ysize, image->zsize);
 
 	for (i = 0; i < 2 * PI; i += inc) {
 		sign = ((int) i) % 2 == 0 ? 1 : -1;
@@ -58,30 +57,6 @@ void testCube(Image* image) {
 		saveImage(name, cubeImage->img, cubeImage->width, cubeImage->height);
 		freeImage2D(cubeImage);
 	}
-}
-
-void testSlice(Image* image) {
-	char name[200];
-	float i = 0;//PI / 4;
-	float inc = 0.05;
-	float xinc = 1 * (1 * inc);
-	float yinc = 1 * (3 * inc);
-	float zinc = 1 * (1 * inc);
-	Point3D origin = createPoint3D(image->xsize / 2, image->ysize / 2, image->zsize / 2);
-	Vector3D normal = createVector3D(0, 0, -1);
-	printf("%d %d %d\n", image->xsize, image->ysize, image->zsize);
-
-	for (i = 0; i < 2 * PI; i += inc) {
-		sprintf(name, "out/slice_%f", i);
-
-		normal = normalizedVector3D(rotateZ(rotateY(rotateX(normal, NULL, xinc, false), NULL, yinc, false), NULL, zinc, false));
-		Image2D slice = getSlice(origin, normal, image);
-		saveImage(name, slice->img, slice->width, slice->height);
-		freeImage2D(slice);
-
-		printf("%s done\n", name);
-	}
-	free(normal);
 }
 
 void testMath() {
@@ -147,13 +122,12 @@ void testMath() {
 int main(int argc, char* argv[]) {
 	testMath();
 	testStar();
-	if (argv[1][0] == 'c') {
-		testCube(ReadImage(argv[2]));
-		system("convert -delay 0 -loop 0 out/cube_*.pgm ~/Desktop/cube.gif");
-	} else if (argv[1][0] == 's') {
-		testSlice(ReadImage(argv[2]));
-		system("convert -delay 0 -loop 0 out/slice_*.pgm ~/Desktop/slice.gif");
-	}
+
+	testCube(NULL);
+	system("convert -delay 0 -loop 0 out/cube_*.pgm ~/Desktop/cubeWire.gif && rm out/cube_*.pgm");
+
+	testCube(ReadImage(argv[1]));
+	system("convert -delay 0 -loop 0 out/cube_*.pgm ~/Desktop/cube.gif");
 
 	return 0;
 }

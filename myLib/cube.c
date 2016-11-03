@@ -165,9 +165,25 @@ void updateCube(Cube cube) {
 }
 
 void destroyCube(Cube cube) {
+	int i;
+
+	for (i = 0; i < cube->nVertices; i++) {
+		free(cube->vertices[i]);
+	}
 	free(cube->vertices);
+
+	for (i = 0; i < cube->nEdges; i++) {
+		free(cube->edges[i]);
+	}
 	free(cube->edges);
+
+	for (i = 0; i < cube->nFaces; i++) {
+		free(cube->faces[i]->normal);
+		free(cube->faces[i]->vertices);
+		free(cube->faces[i]);
+	}
 	free(cube->faces);
+
 	free(cube->size);
 	free(cube->origin);
 

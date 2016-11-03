@@ -42,17 +42,30 @@ Vector3D calculateNormal(Vertices vertices, int vCount) {
 	Vector3D v1 = copy(createVector3D(0, 0, 0), vertices[1]);
 	Vector3D v2 = copy(createVector3D(0, 0, 0), vertices[2]);
 
-	Vector3D a = translate(v1, v0, true);
-	Vector3D b = translate(v2, v0, true);
+	v1 = translate(v1, v0, true);
+	v2 = translate(v2, v0, true);
+	Vector3D v = vectorProduct(v1, v2);
 
-	return normalizedVector3D(vectorProduct(a, b));
+	free(v0);
+	free(v1);
+	free(v2);
+
+	return normalizedVector3D(v);
 }
 
 Vector3D calculateFaceNormal(Face face) {
+	Vector3D reverse = createVector3D(-1, -1, -1);
+
+	if (face->normal != NULL) {
+		free(face->normal);
+	}
+
 	face->normal = calculateNormal(face->vertices, 4);
 	if (face->invertedNormal) {
-		scale(face->normal, createVector3D(-1, -1, -1), false);
+		scale(face->normal, reverse, false);
 	}
+
+	free(reverse);
 
 	return face->normal;
 }
@@ -113,7 +126,9 @@ Point3D rotateZ(Point3D p, Point3D origin, float theta, bool inverse) {
 
 	translate(q, origin, false);
 
-	return copy(p, q);
+	copy(p, q);
+	free(q);
+	return p;
 }
 
 Point3D rotateY(Point3D p, Point3D origin, float theta, bool inverse) {
@@ -128,7 +143,9 @@ Point3D rotateY(Point3D p, Point3D origin, float theta, bool inverse) {
 
 	translate(q, origin, false);
 
-	return copy(p, q);
+	copy(p, q);
+	free(q);
+	return p;
 }
 
 Point3D rotateX(Point3D p, Point3D origin, float theta, bool inverse) {
@@ -143,7 +160,9 @@ Point3D rotateX(Point3D p, Point3D origin, float theta, bool inverse) {
 
 	translate(q, origin, false);
 
-	return copy(p, q);
+	copy(p, q);
+	free(q);
+	return p;
 }
 
 Point3D rotate(Point3D p, Point3D origin, Vector3D rotation, float theta, bool inverse) {
@@ -196,6 +215,7 @@ Face createFace(Vertices vertices, bool invertedNormal) {
 
 	Face f = (Face) malloc(sizeof(_face));
 
+	f->normal = NULL;
 	f->invertedNormal = invertedNormal;
 	f->vertices = (Vertices) malloc(sizeof(Vertex) * 4);
 
