@@ -20,6 +20,11 @@ ColorizeDialog::ColorizeDialog(QWidget *parent, Image3D &img, float percent) :
 
 }
 
+
+Image3D ColorizeDialog::getImgLabel(){
+    return this->imgLabel;
+}
+
 ColorizeDialog::~ColorizeDialog()
 {
     delete scene;
@@ -34,22 +39,19 @@ void ColorizeDialog::on_button_loadLabel_clicked(bool t){
 
     if(!fileName.isEmpty()){
         ImgFormat::detect::read(imgLabel,fileName.toStdString());
-//        img.colorize(imgLabel);
+        img.colorize(imgLabel);
+        ui->button_apply_pallete->setEnabled(false);
+        this->colorizeValue = "label";
         writeImage();
 
     }
 }
 
 void ColorizeDialog::on_button_apply_pallete_clicked(bool t){
-
-    std::cout << " BANANA" << std::endl;
-
     radio_linear_toogle(false);
 }
 
 void ColorizeDialog::radio_linear_toogle(bool t){
-    std::cout << percent << std::endl;
-    std::cout << " TESTE" << std::endl;
     colorize = true;
     writeImage();
 }

@@ -18,6 +18,7 @@ public:
     explicit ColorizeDialog(QWidget *parent, Image3D &img, float percent);
     ~ColorizeDialog();
     QString getColorizeValue();
+    Image3D getImgLabel();
 
 private slots:
      void on_button_apply_pallete_clicked(bool);

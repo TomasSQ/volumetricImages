@@ -120,6 +120,9 @@ void MainWindow::on_buttonColorize_clicked(bool b){
     c = new ColorizeDialog(this, img, value1);
     if (c->exec()) {
         colorize = c->getColorizeValue();
+        if(colorize == "label"){
+            this->imgLabel = c->getImgLabel();
+        }
     }
 
     delete c;
@@ -151,10 +154,19 @@ void MainWindow::fill_with_slices(void* v, float percent){
             cut.apply_pallete();
             cut2.apply_pallete();
             cut3.apply_pallete();
-        } else {
+        } else if(colorize == "hsl2rgb") {
             cut.apply_pallete_over_HSL2RGB_space();
             cut2.apply_pallete_over_HSL2RGB_space();
             cut3.apply_pallete_over_HSL2RGB_space();
+        } else{
+            Image3D labelCut, labelCut2, labelCut3;
+            imgLabel.ort_plane(labelCut, 0, value1, 0, 1, 1);
+            imgLabel.ort_plane(labelCut2, 1,value2, 0, 1,1);
+            imgLabel.ort_plane(labelCut3, 2,value3, 0, 0,1);
+            cut.colorize(labelCut);
+            cut2.colorize(labelCut2);
+            cut3.colorize(labelCut3);
+
         }
     }
 

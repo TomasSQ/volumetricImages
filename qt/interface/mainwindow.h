@@ -35,7 +35,7 @@ private:
     QGraphicsScene *scene,*scene2,*scene3;
     QPixmap pix;
     libscnqt libScnQt;
-    Image3D img;
+    Image3D img, imgLabel;
     Voxel v_max, v_min;
     bool linear_transform = false;
     QString colorize = "nocolor";
