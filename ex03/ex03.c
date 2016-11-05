@@ -4,50 +4,6 @@
 
 #define EXTRA_STEP_FACTOR 2
 
-typedef struct {
-	float x;
-	float y;
-	float z;
-	int n;
-} Inc;
-
-Inc getInc(Point3D start, Point3D end, bool ignoreZ) {
-	float deltaX, deltaY, deltaZ;
-
-	Inc inc;
-	inc.n = 0;
-	inc.x = 0;
-	inc.y = 0;
-	inc.z = 0;
-
-	if (samePoint(start, end)) {
-		return inc;
-	}
-
-	deltaX = end->x - start->x;
-	deltaY = end->y - start->y;
-	deltaZ = end->z - start->z;
-
-	if (ABS(deltaX) >= ABS(deltaY) && (ignoreZ || ABS(deltaX) >= ABS(deltaZ))) {
-		inc.n = ABS(deltaX) + 1;
-		inc.x = SIGN(deltaX);
-		inc.y = inc.x * deltaY / deltaX;
-		inc.z = inc.x * deltaZ / deltaX;
-	} else if (ABS(deltaY) >= ABS(deltaX) && (ignoreZ || ABS(deltaY) >= ABS(deltaZ))) {
-		inc.n = ABS(deltaY) + 1;
-		inc.y = SIGN(deltaY);
-		inc.x = inc.y * deltaX / deltaY;
-		inc.z = inc.y * deltaZ / deltaY;
-	} else if (!ignoreZ) {
-		inc.n = ABS(deltaZ) + 1;
-		inc.z = SIGN(deltaZ);
-		inc.x = inc.z * deltaX / deltaZ;
-		inc.y = inc.z * deltaY / deltaZ;
-	}
-
-	return inc;
-}
-
 Point3D reverseRotation(Point3D p, Point3D origin, Vector3D rotation) {
 	Point3D aux = copy(createPoint3D(0, 0, 0), p);
 

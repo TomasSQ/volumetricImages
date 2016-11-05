@@ -11,16 +11,6 @@ Point3D copy(Point3D p, Point3D q) {
 	return p;
 }
 
-Point3D project(Vector3D planeRotation, Point3D p, int D) {
-	// Point3D p2 = rotateX(p, createPoint3D(D, D, D), planeRotation->x, false);
-	// p2 = rotateY(p2, createPoint3D(D, D, D), planeRotation->y, false);
-	// p2->x += 0;
-	// p2->y += 0;
-	// p2->z = 0;
-
-	return p;
-}
-
 float angleBetweenVectors(Vector3D a, Vector3D b) {
 	float modules = moduleOfVector3D(a) * moduleOfVector3D(b);
 
@@ -181,6 +171,43 @@ Point3D rotate(Point3D p, Point3D origin, Vector3D rotation, float theta, bool i
 
 bool samePoint(Point3D a, Point3D b) {
 	return a->x == b->x && a->y == b->y && a->z == b->z;
+}
+
+Inc getInc(Point3D start, Point3D end, bool ignoreZ) {
+	float deltaX, deltaY, deltaZ;
+
+	Inc inc;
+	inc.n = 0;
+	inc.x = 0;
+	inc.y = 0;
+	inc.z = 0;
+
+	if (samePoint(start, end)) {
+		return inc;
+	}
+
+	deltaX = end->x - start->x;
+	deltaY = end->y - start->y;
+	deltaZ = end->z - start->z;
+
+	if (ABS(deltaX) >= ABS(deltaY) && (ignoreZ || ABS(deltaX) >= ABS(deltaZ))) {
+		inc.n = ABS(deltaX) + 1;
+		inc.x = SIGN(deltaX);
+		inc.y = inc.x * deltaY / deltaX;
+		inc.z = inc.x * deltaZ / deltaX;
+	} else if (ABS(deltaY) >= ABS(deltaX) && (ignoreZ || ABS(deltaY) >= ABS(deltaZ))) {
+		inc.n = ABS(deltaY) + 1;
+		inc.y = SIGN(deltaY);
+		inc.x = inc.y * deltaX / deltaY;
+		inc.z = inc.y * deltaZ / deltaY;
+	} else if (!ignoreZ) {
+		inc.n = ABS(deltaZ) + 1;
+		inc.z = SIGN(deltaZ);
+		inc.x = inc.z * deltaX / deltaZ;
+		inc.y = inc.z * deltaY / deltaZ;
+	}
+
+	return inc;
 }
 
 Point3D createPoint3D(float x, float y, float z) {

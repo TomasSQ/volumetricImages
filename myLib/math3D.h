@@ -29,6 +29,13 @@ typedef struct {
 } _face;
 typedef _face* Face;
 
+typedef struct {
+	float x;
+	float y;
+	float z;
+	int n;
+} Inc;
+
 Point3D createPoint3D(float x, float y, float z);
 Vertex createVertex(float x, float y, float z);
 Vector3D createVector3D(float x, float y, float z);
@@ -56,7 +63,7 @@ Vector3D vectorProduct(Vector3D a, Vector3D b);
 Vector3D normalizedVector3D(Vector3D a);
 Vector3D calculateNormal(Vertices vertices, int vCount);
 Vector3D calculateFaceNormal(Face face);
-Point3D project(Vector3D planeRotation, Point3D p, int D);
+Inc getInc(Point3D start, Point3D end, bool ignoreZ);
 
 Point3D copy(Point3D destination, Point3D origin);
 

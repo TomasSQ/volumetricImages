@@ -67,9 +67,9 @@ Vector3D alignCube(Cube cube, Vector3D normal) {
 		if (rotationY) {
 			rotateY(cube->vertices[i], cube->origin, rotationY, false);
 		}
-		if (rotationZ) {
-			rotateZ(cube->vertices[i], cube->origin, rotationZ, false);
-		}
+		//if (rotationZ) {
+		//	rotateZ(cube->vertices[i], cube->origin, rotationZ, false);
+		//}
 	}
 
 	updateCube(cube);
