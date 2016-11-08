@@ -4,9 +4,7 @@
 
 #define EXTRA_STEP_FACTOR 2
 
-Point3D reverseRotation(Point3D p, Point3D origin, Vector3D rotation) {
-	Point3D aux = copy(createPoint3D(0, 0, 0), p);
-
+Point3D reverseRotation(Point3D aux, Point3D origin, Vector3D rotation) {
 	if (rotation->y != 0) {
 		aux = rotateY(aux, origin, rotation->y, true);
 	}
@@ -20,7 +18,7 @@ Point3D reverseRotation(Point3D p, Point3D origin, Vector3D rotation) {
 	return aux;
 }
 
-void drawLineOfSquare(Image2D image, Point3D start, Inc inc, Image* img, Vector3D rotation, Point3D origin) {
+void drawLineOfSquare(Image2D image, Point3D start, Inc inc, Image* img, Vector3D rotation, Point3D origin, Point3D dp) {
 	int i, x, y, voxel;
 	Point3D p = createPoint3D(start->x, start->y, start->z);
 	Point3D aux;
@@ -35,13 +33,16 @@ void drawLineOfSquare(Image2D image, Point3D start, Inc inc, Image* img, Vector3
 			} else {
 				voxel = -1;
 			}
-			if (rotation == NULL) {
+			if (dp == NULL) {
 				x = p->x;
 				y = p->y;
 			} else {
-				aux = reverseRotation(p, origin, rotation);
-				x = aux->x;
-				y = aux->y;
+				aux = copy(createVector3D(0, 0, 0), p);
+				aux = reverseRotation(aux, dp, rotation);
+				aux = translate(aux, dp, false);
+				// aux = translate(aux, dp, true);
+				x = aux->x + image->width / 2 * 0;
+				y = aux->y + image->height / 2 * 0;
 				free(aux);
 			}
 			if (0 < x && x < image->width && 0 < y && y < image->height) {
@@ -57,7 +58,7 @@ void drawLineOfSquare(Image2D image, Point3D start, Inc inc, Image* img, Vector3
 	free(p);
 }
 
-void drawSquare(Image2D image, Vertices vertices, Image* img, Vector3D reverseRotation, Point3D origin) {
+void drawSquare(Image2D image, Vertices vertices, Image* img, Vector3D reverseRotation, Point3D origin, Point3D dp) {
 	Vertex start, end;
 	Inc inc;
 	int i;
@@ -67,7 +68,7 @@ void drawSquare(Image2D image, Vertices vertices, Image* img, Vector3D reverseRo
 	end = copy(createPoint3D(0, 0, 0), vertices[1]);
 
 	for (i = 0; i < inc.n * EXTRA_STEP_FACTOR; i++) {
-		drawLineOfSquare(image, start, getInc(start, end, false), img, reverseRotation, origin);
+		drawLineOfSquare(image, start, getInc(start, end, false), img, reverseRotation, origin, dp);
 		start->x += inc.x / EXTRA_STEP_FACTOR;
 		start->y += inc.y / EXTRA_STEP_FACTOR;
 		start->z += inc.z / EXTRA_STEP_FACTOR;
@@ -89,7 +90,7 @@ Image2D render(Vector3D planeRotation, Cube cube, Image* img) {
 	Image2D image = img == NULL ? newImage2D(200, 200) : newImage2D(img->xsize, img->ysize);
 	for (i = 0; i < 6; i++) {
 		if (visible[i]) {
-			drawSquare(image, cube->faces[i]->vertices, img, NULL, NULL);
+			drawSquare(image, cube->faces[i]->vertices, img, NULL, NULL, NULL);
 			for (f = 0; f < 3; f++) {
 				drawLine(image, cube->faces[i]->vertices[f], cube->faces[i]->vertices[f + 1], 255, false);
 			}

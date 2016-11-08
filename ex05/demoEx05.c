@@ -34,13 +34,13 @@ void testSlice(Image* image) {
 void testSlice2(Image* image) {
 	char name[200];
 	int i = 0;
-	Point3D maxP = createPoint3D(image->xsize / 2, image->ysize, image->zsize / 2);
-	Point3D minP = createPoint3D(image->xsize / 2, 0, image->zsize / 2);
+	Point3D maxP = createPoint3D(image->xsize, image->ysize, image->zsize);
+	Point3D minP = createPoint3D(0, 0, 0);
 	Inc inc = getInc(minP, maxP, false);
 
 	Point3D origin = copy(createPoint3D(0, 0, 0), minP);
-	Vector3D normal = createVector3D(0, -1, 0);
-	//normal = normalizedVector3D(rotateY(rotateX(normal, NULL, PI / 4, false), NULL, PI / 4, false));
+	Vector3D normal = copy(createPoint3D(0, 0, 0), maxP);
+	normal = normalizedVector3D(translate(normal, minP, true));
 
 	for (i = 0; i < inc.n; i++) {
 		sprintf(name, "out/slice_line_%03d", i);
