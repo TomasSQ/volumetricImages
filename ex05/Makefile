@@ -9,7 +9,7 @@ clean:
 	rm -rf ex03.o out
 
 run:
-	mkdir -p out && rm -f out/slice_* && clear && make && ./ex05.o s ../libmo815-3dvis/data/brain.scn
+	mkdir -p out && rm -f out/slice_* && clear && make && ./ex05.o s ../libmo815-3dvis/data/skull.scn
 
 gif:
 	convert -delay 0 -loop 0 out/slice_*.pgm ~/Desktop/slice.gif
