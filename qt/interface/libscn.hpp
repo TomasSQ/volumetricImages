@@ -2,6 +2,8 @@
 #ifndef LIBSCN_HPP
 #define LIBSCN_HPP
 
+#include "tmat.hpp"
+
 #include <vector>
 #include <bitset>
 #include <functional>
@@ -54,7 +56,11 @@ class Voxel{public:
 	bool operator>=(const Voxel& rhs)const;
 
 	void set(const std::vector<std::vector<std::bitset<8> > >&new_value);
+	template<class T>
+	void set(T new_value);
 };
+
+std::ostream&operator<<(std::ostream&os,Voxel const&v);
 
 /* Class that stores image metadata */
 class MetaData{public:
@@ -110,6 +116,13 @@ class Image3D{
 	bool bounded_0(int x,int y,int z)const;
 	bool in_range(int x,int y,int z)const;
 
+	void resize(int n0,int n1,int n2);
+
+	/* Interpolation */
+	const Voxel& get_bounded(int x,int y,int z)const;
+	const Voxel& get_NN(float x,float y,float z)const;
+	Voxel get_trili(float x,float y,float z)const;
+
 	/* Extract orthogonal plane determined by {a_,p_.aX,sX,sY} to ret[_][_][0] */
 	/*TRF-1*/
 	void ort_plane(Image3D&ret,int a_=0,int p_=-1,int aX=0,int sX=1,int sY=1)const;
@@ -124,7 +137,6 @@ class Image3D{
 	/*TRF-3*/
 	void colorize(const Image3D&label);
 	void apply_pallete();
-    void apply_pallete_over_HSL2RGB_space();
 
 	/* ret must already be the same size of *this */
 	void erode_by_1(Image3D&ret)const;
@@ -134,6 +146,23 @@ class Image3D{
 	void subtract(const Image3D&mask);
 
 	void mirror(Image3D&ret,int a=0)const;
+
+	/* compute transformed image boundaries */
+	void transformation_bounds(const TMat&T,int m[3],int M[3])const;
+	/* geometric projection / get slice */
+	void simple_project(Image3D&ret,const TMat&T,int p_=0)const;
+	void        project(Image3D&ret,const TMat&T,int p_=0)const;
+	
+	/* img must be the same size of *this */
+	void maximum(const Image3D&img);
+	void disjunct(const Image3D&img);
+	/* Maximum intensity projection */
+	void MIP(Image3D&ret,const TMat&T)const;
+	
+	void operate_memo(const Image3D&img,std::vector<std::vector<unsigned int> >&memo);
+	void aggregate_projections(Image3D&ret,const TMat&T)const;
+
+    void apply_pallete_over_HSL2RGB_space();
 
 };
 /* Functions for Images */

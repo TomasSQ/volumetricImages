@@ -6,6 +6,7 @@
 #include "colorizedialog.h"
 #include "libscn.hpp"
 #include "libscnqt.h"
+#include "rendering.h"
 
 
 namespace Ui {
@@ -29,11 +30,12 @@ public slots:
     void on_horizontalSlider_transformationsB_valueChanged(int);
     void on_horizontalSlider_transformationsA_valueChanged(int);
     void on_buttonColorize_clicked(bool);
+    void on_buttonRendering_clicked(bool);
 
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene,*scene2,*scene3;
-    QPixmap pix;
+    QPixmap pix, pix2, pix3;
     libscnqt libScnQt;
     Image3D img, imgLabel;
     Voxel v_max, v_min;
@@ -41,6 +43,8 @@ private:
     QString colorize = "nocolor";
     int I1,I2,k1,k2;
     ColorizeDialog *c;
+    rendering *r;
+    QByteArray qBA;
 
 
 

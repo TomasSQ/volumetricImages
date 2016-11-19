@@ -5,7 +5,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <QFileDialog>
-
+#include "rendering.h"
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -129,6 +130,34 @@ void MainWindow::on_buttonColorize_clicked(bool b){
     fill_with_slices(&img, ui->horizontalSlider->value()/100.0);
 }
 
+
+void MainWindow::on_buttonRendering_clicked(bool b){
+
+//    using ImgMacro::pfx ;
+//    Image3D MIP;
+//    for(int fi=0;fi<360;fi+=15){
+
+//            TMat tm,tmC,tmS,tmR1,tmR2,tmR3;
+//            tmR1.rotation(0,fi);
+//            tmR2.rotation(1,30);
+//            tmR3.rotation(2,180);
+//            tm = tmR3*tmR2*tmR1;
+
+
+//        img.MIP(MIP,tm);
+
+//        std::string fnm=pfx+"tmp/MIPfr2m/"+Util::padded_num(fi,3)+".ppm";ImgFormat::detect::write(MIP,fnm);
+//        std::cout<<fnm << std::endl;
+
+//    }
+//    ImageMagick::animate("tmp/MIPfr2m","tmp/MIPfr2m");
+
+
+    r = new rendering(this,img);
+    r->exec();
+    delete r;
+}
+
 void MainWindow::fill_with_slices(void* v, float percent){
     Image3D *img = (Image3D*) v;
     int value1 = -1, value2 = -1, value3 = -1;
@@ -170,7 +199,6 @@ void MainWindow::fill_with_slices(void* v, float percent){
         }
     }
 
-    QByteArray qBA;
     libScnQt.generateInMemoryImg(cut, &qBA);
 
     pix.loadFromData(qBA, "PPM");
@@ -182,19 +210,19 @@ void MainWindow::fill_with_slices(void* v, float percent){
 
     qBA.clear();
     libScnQt.generateInMemoryImg(cut2, &qBA);
-    pix.loadFromData(qBA, "PPM");
+    pix2.loadFromData(qBA, "PPM");
     scene2->clear();
-    scene2->addPixmap(pix);
-    scene2->setSceneRect(pix.rect());
+    scene2->addPixmap(pix2);
+    scene2->setSceneRect(pix2.rect());
     ui->graphicsView_2->setScene(scene2);
     ui->graphicsView_2->update();
 
     qBA.clear();
     libScnQt.generateInMemoryImg(cut3, &qBA);
-    pix.loadFromData(qBA, "PPM");
+    pix3.loadFromData(qBA, "PPM");
     scene3->clear();
-    scene3->addPixmap(pix);
-    scene3->setSceneRect(pix.rect());
+    scene3->addPixmap(pix3);
+    scene3->setSceneRect(pix3.rect());
     ui->graphicsView_3->setScene(scene3);
     ui->graphicsView_3->update();
 }
