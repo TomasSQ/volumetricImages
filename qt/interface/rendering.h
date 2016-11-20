@@ -28,7 +28,7 @@ public slots:
 private:
     Ui::rendering *ui;
     void writeImage();
-    const Image3D img;
+    const Image3D &img;
     TMat tm,tmC,tmS,tmR1,tmR2,tmR3;
     QGraphicsScene *scene;
     libscnqt libScnQt;

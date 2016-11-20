@@ -135,13 +135,13 @@ void MainWindow::on_buttonRendering_clicked(bool b){
 
 //    using ImgMacro::pfx ;
 //    Image3D MIP;
+//    TMat tm,tmC,tmS,tmR1,tmR2,tmR3, tmT;
+//    tmR2.rotation(1,30);
+//    tmR3.rotation(2,180);
+//    tmT = tmR3 * tmR2;
 //    for(int fi=0;fi<360;fi+=15){
-
-//            TMat tm,tmC,tmS,tmR1,tmR2,tmR3;
 //            tmR1.rotation(0,fi);
-//            tmR2.rotation(1,30);
-//            tmR3.rotation(2,180);
-//            tm = tmR3*tmR2*tmR1;
+//            tm = tmT*tmR1;
 
 
 //        img.MIP(MIP,tm);

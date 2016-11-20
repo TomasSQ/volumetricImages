@@ -552,6 +552,21 @@ namespace VoxelMap{
 		}}
 	}
 
+    /* ret already has correct size, dont compute bounds */
+    void Image3D::project_with_maximum(Image3D& ret, const TMat&T,int p_) const {
+        float x,y,z;
+        int iz=p_;
+        for(int ix=0;ix<ret.get_n(0);++ix){
+        for(int iy=0;iy<ret.get_n(1);++iy){
+            T.appl(ix,iy,iz,x,y,z);
+            if(ret.cref(ix,iy, 0) < Image3D::get_NN(x,y,z)){
+                ret.set(ix, iy, 0, Image3D::get_NN(x,y,z));
+            }
+
+        }}
+    }
+
+
 	/* Project image without additional info */
 	void Image3D::project(Image3D&ret,const TMat&T,int p_)const{
 		/* Get image boundaries */
@@ -587,32 +602,29 @@ namespace VoxelMap{
 		}}}
 	}
 	
-	/* Maximum intensity projection */
-	void Image3D::MIP(Image3D&ret,const TMat&T)const{int a_=2;
-		/* Get image boundaries */
-		TMat Ti(T.inv());int m[3],M[3];float d[3];
-		transformation_bounds(Ti,m,M);
-		for(int i=0;i<3;++i){d[i]=M[i]-m[i];}
-		/* Automagically re-center and avoid cropping */
-		Ti.translation(m[0],m[1],m[2]);TMat Ta(T*Ti);
-        Image3D frm;
+
+    void Image3D::MIP(Image3D&ret,const TMat&T)const{int a_=2;
+        /* Get image boundaries */
+        TMat Ti(T.inv());int m[3],M[3];float d[3];
+        transformation_bounds(Ti,m,M);
+        for(int i=0;i<3;++i){d[i]=M[i]-m[i];}
+        /* Automagically re-center and avoid cropping */
+        Ti.translation(m[0],m[1],m[2]);TMat Ta(T*Ti);
         d[0]=get_n(0);
         d[1]=get_n(1);
-        //d[2]=get_n(2);
-        frm.resize(d[0],d[1],1);
-        //frm.resize(get_n(0),get_n(1),1);
-        frm.md.mv=0;
-		/* initial value */
-		simple_project(frm,Ta,0);
-		ret=frm;
-		/* maximum project */
+        ret.resize(d[0],d[1],1);
+        ret.md.mv=0;
+        /* initial value */
+        simple_project(ret,Ta,0);
+        /* maximum project */
+        std::cout << d[a_] << std::endl;
         for(int mi=1;mi<d[a_]/2;++mi){
-			simple_project(frm,Ta,mi);
-			ret.maximum(frm);
-			//ret.disjunct(frm);
-		}
-	}
-	
+            project_with_maximum(ret, Ta, mi);
+//            ret.maximum(frm);
+        }
+    }
+
+
 	/* aggregator with memory */
 	void Image3D::operate_memo(const Image3D&img,std::vector<std::vector<unsigned int> >&memo){
 		int c1,cB,cD,cT;
@@ -655,9 +667,7 @@ namespace VoxelMap{
 		/* project and aggregate */
 		for(int mi=1;mi<d[a_];++mi){//DBG(mi);
 			simple_project(frm,Ta,mi);
-			//ret.maximum(frm);
-			//ret.disjunct(frm);
-			ret.operate_memo(frm,memo);
+            ret.operate_memo(frm,memo);
 		}
 	}
 

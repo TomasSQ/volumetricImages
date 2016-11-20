@@ -152,6 +152,7 @@ class Image3D{
 	/* geometric projection / get slice */
 	void simple_project(Image3D&ret,const TMat&T,int p_=0)const;
 	void        project(Image3D&ret,const TMat&T,int p_=0)const;
+    void project_with_maximum(Image3D& ret,const TMat&T,int p_)const ;
 	
 	/* img must be the same size of *this */
 	void maximum(const Image3D&img);

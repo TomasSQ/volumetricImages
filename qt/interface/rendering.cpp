@@ -42,7 +42,7 @@ void rendering::writeImage(){
     tmR2.rotation(1,ui->horizontalSlider_B->value());
     tmR3.rotation(2,ui->horizontalSlider_C->value());
     tm = tmR3*tmR2*tmR1;
-    img.MIP(MIP,tm);
+    img.aggregate_projections(MIP,tm);
 
 
     libScnQt.generateInMemoryImg(MIP, &qBA);

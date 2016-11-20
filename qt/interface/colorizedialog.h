@@ -29,7 +29,7 @@ private slots:
 private:
     void writeImage();
     Ui::ColorizeDialog *ui;
-    Image3D img, imgLabel;
+    Image3D &img, imgLabel;
     QGraphicsScene *scene;
     QPixmap pix;
     libscnqt libScnQt;
