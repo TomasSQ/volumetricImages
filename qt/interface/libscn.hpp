@@ -132,7 +132,9 @@ class Image3D{
 	Voxel top(Compare comp)const;
 
 	/*TRF-2*/
-	void linear_transform(int I1,int I2,int k1,int k2);
+	void transform_lin(int I1,int I2,int k1,int k2);
+	void transform_pow(int I1,int I2,int k1,int k2,float exp=1.0);
+	void transform_log(int I1,int I2,int k1,int k2,float exp=1.0);
 
 	/*TRF-3*/
 	void colorize(const Image3D&label);
@@ -150,9 +152,9 @@ class Image3D{
 	/* compute transformed image boundaries */
 	void transformation_bounds(const TMat&T,int m[3],int M[3])const;
 	/* geometric projection / get slice */
-	void simple_project(Image3D&ret,const TMat&T,int p_=0)const;
-	void        project(Image3D&ret,const TMat&T,int p_=0)const;
-    void project_with_maximum(Image3D& ret,const TMat&T,int p_)const ;
+	void project_direct(Image3D&ret,const TMat&T,int p_=0)const;
+	void project_tailor(Image3D&ret,const TMat&T,int p_=0)const;
+	void project_if_max(Image3D&ret,const TMat&T,int p_=0)const;
 	
 	/* img must be the same size of *this */
 	void maximum(const Image3D&img);
@@ -160,10 +162,8 @@ class Image3D{
 	/* Maximum intensity projection */
 	void MIP(Image3D&ret,const TMat&T)const;
 	
-	void operate_memo(const Image3D&img,std::vector<std::vector<unsigned int> >&memo);
-	void aggregate_projections(Image3D&ret,const TMat&T)const;
-
-    void apply_pallete_over_HSL2RGB_space();
+	void operate_memo(const Image3D&img,std::vector<std::vector<unsigned int> >&memo,int c1=2);
+	void aggregate_projections(Image3D&ret,const TMat&T,int c1=2)const;
 
 };
 /* Functions for Images */

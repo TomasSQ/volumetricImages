@@ -5,7 +5,6 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <sstream>
 
 /* Non-image related utils */
 namespace Util{
@@ -199,7 +198,7 @@ namespace VoxelMap{
 	bool Image3D::in_range(int x,int y,int z)const{return bounded_n(x,y,z)&&bounded_0(x,y,z);}
 
 	void Image3D::resize(int n0,int n1,int n2){
-        if(n[0]>=n0&&n[1]>=n1&&n[2]>=n2)return;
+		if(n[0]==n0&&n[1]==n1&&n[2]==n2)return;
 		n[0]=n0;n[1]=n1;n[2]=n2;
 								 data.resize(n[0]);
 			for(auto &Vx__:data){Vx__.resize(n[1]);
@@ -247,23 +246,6 @@ namespace VoxelMap{
 		
 		return VoxelMap::transform(static_cast<int>(Vxyz));
 	}
-
-
-    void Image3D::apply_pallete_over_HSL2RGB_space(){
-            int x_min = top(std::greater<Voxel>()).to_ulong();
-            int x_max = top(std::less   <Voxel>()).to_ulong();
-            double x_d = (x_max-x_min);
-            for(auto &Vx:data){
-            for(auto &Vxy:Vx){
-            for(auto &Vxyz:Vxy){
-                double x_i = Vxyz.to_ulong();
-                double y_i = (((x_i-x_min)/* *(y_d)*/)/x_d)+0.0;
-                /* Vanilla rainbow pallete: */
-                double H = y_i*300.0;double S = 1.0;double L = 0.5;
-                Vxyz=VoxelMap::transform(ColorSpace::HSL2RGB(H,S,L));
-
-            }}}
-        }
 
 	/* Extract orthogonal plane determined by {a_,p_.aX,sX,sY} to ret[_][_][0] */
 	/*TRF-1*/
@@ -333,7 +315,7 @@ namespace VoxelMap{
 	}
 
 	/*TRF-2*/
-	void Image3D::linear_transform(int I1,int I2,int k1,int k2){
+	void Image3D::transform_lin(int I1,int I2,int k1,int k2){
 		int k;int I;
 		int   kd = (k2-k1);
 		float Id = (I2-I1);if(Id==0)Id=1;
@@ -355,6 +337,55 @@ namespace VoxelMap{
 				  k = k1 + (				(	I-I1		)	*mf);
 				//k = k1 + (pow				(	I-I1	,exp)	*mf);
 				//k = k1 + (pow	(std::log	(1+	I-I1)	,exp)	*mf);
+			}
+			Vxyz=VoxelMap::transform(k);
+		}}}
+	}
+	void Image3D::transform_pow(int I1,int I2,int k1,int k2,float exp){
+		int k;int I;
+		int   kd = (k2-k1);
+		float Id = (I2-I1);if(Id==0)Id=1;
+
+		/* Used for generic transformations: */
+			Id=pow(			Id	,exp);
+			//Id=pow(std::log(1+Id)	,exp);
+		/* Optmization */
+			float mf=(kd)/(Id);
+		
+		for(auto &Vx:data){
+		for(auto &Vxy:Vx){
+		for(auto &Vxyz:Vxy){
+			I=VoxelMap::transform(Vxyz);
+			     if(I< I1) k = k1;
+			else if(I>=I2) k = k2;
+			else{
+				//k = k1 + (				(	I-I1		)	*mf);
+				  k = k1 + (pow				(	I-I1	,exp)	*mf);
+				//k = k1 + (pow	(std::log	(1+	I-I1)	,exp)	*mf);
+			}
+			Vxyz=VoxelMap::transform(k);
+		}}}
+	}
+	void Image3D::transform_log(int I1,int I2,int k1,int k2,float exp){
+		int k;int I;
+		int   kd = (k2-k1);
+		float Id = (I2-I1);if(Id==0)Id=1;
+
+		/* Used for generic transformations: */
+			Id=pow(std::log(1+Id)	,exp);
+		/* Optmization */
+			float mf=(kd)/(Id);
+		
+		for(auto &Vx:data){
+		for(auto &Vxy:Vx){
+		for(auto &Vxyz:Vxy){
+			I=VoxelMap::transform(Vxyz);
+			     if(I< I1) k = k1;
+			else if(I>=I2) k = k2;
+			else{
+				//k = k1 + (				(	I-I1		)	*mf);
+				//k = k1 + (pow				(	I-I1	,exp)	*mf);
+				  k = k1 + (pow	(std::log	(1+	I-I1)	,exp)	*mf);
 			}
 			Vxyz=VoxelMap::transform(k);
 		}}}
@@ -541,34 +572,35 @@ namespace VoxelMap{
 	}
 
 	/* ret already has correct size, dont compute bounds */
-	void Image3D::simple_project(Image3D&ret,const TMat&T,int p_)const{
+	void Image3D::project_direct(Image3D&ret,const TMat&T,int p_)const{
 		float x,y,z;
 		int iz=p_;
 		for(int ix=0;ix<ret.get_n(0);++ix){
 		for(int iy=0;iy<ret.get_n(1);++iy){
 			T.appl(ix,iy,iz,x,y,z);
-			ret.set(ix,iy,0, Image3D::get_NN(x,y,z) );
+			  ret.set(ix,iy,0, Image3D::get_NN   (x,y,z) );
 			//ret.set(ix,iy,0, Image3D::get_trili(x,y,z) );
 		}}
 	}
-
-    /* ret already has correct size, dont compute bounds */
-    void Image3D::project_with_maximum(Image3D& ret, const TMat&T,int p_) const {
-        float x,y,z;
-        int iz=p_;
-        for(int ix=0;ix<ret.get_n(0);++ix){
-        for(int iy=0;iy<ret.get_n(1);++iy){
-            T.appl(ix,iy,iz,x,y,z);
-            if(ret.cref(ix,iy, 0) < Image3D::get_NN(x,y,z)){
-                ret.set(ix, iy, 0, Image3D::get_NN(x,y,z));
-            }
-
-        }}
-    }
-
+	
+	/* ret already has correct size, dont compute bounds */
+	void Image3D::project_if_max(Image3D&ret,const TMat&T,int p_)const{
+		float x,y,z;
+		int iz=p_;
+		const Voxel* v_xyz;
+		for(int ix=0;ix<ret.get_n(0);++ix){
+		for(int iy=0;iy<ret.get_n(1);++iy){
+			T.appl(ix,iy,iz,x,y,z);
+			v_xyz=&Image3D::get_NN(x,y,z);
+			if(ret.cref(ix,iy,0) < *v_xyz){
+				ret.set(ix,iy,0,   *v_xyz);
+			}
+		}}
+	}
 
 	/* Project image without additional info */
-	void Image3D::project(Image3D&ret,const TMat&T,int p_)const{
+	/* ret.size will be centered & tailored to transformation */
+	void Image3D::project_tailor(Image3D&ret,const TMat&T,int p_)const{
 		/* Get image boundaries */
 		TMat Ti(T.inv());
 		int m[3],M[3]; float d[3];
@@ -580,7 +612,7 @@ namespace VoxelMap{
 		ret.resize(d[0],d[1],1);
 		ret.md.mv=0;
 		/* Create projection */
-		simple_project(ret,Ta,p_);
+		project_direct(ret,Ta,p_);
 	}
 
 	/* img must be the same size of *this */
@@ -602,33 +634,31 @@ namespace VoxelMap{
 		}}}
 	}
 	
-
-    void Image3D::MIP(Image3D&ret,const TMat&T)const{int a_=2;
-        /* Get image boundaries */
-        TMat Ti(T.inv());int m[3],M[3];float d[3];
-        transformation_bounds(Ti,m,M);
-        for(int i=0;i<3;++i){d[i]=M[i]-m[i];}
-        /* Automagically re-center and avoid cropping */
-        Ti.translation(m[0],m[1],m[2]);TMat Ta(T*Ti);
-        d[0]=get_n(0);
-        d[1]=get_n(1);
-        ret.resize(d[0],d[1],1);
-        ret.md.mv=0;
-        /* initial value */
-        simple_project(ret,Ta,0);
-        /* maximum project */
-        std::cout << d[a_] << std::endl;
-        for(int mi=1;mi<d[a_]/2;++mi){
-            project_with_maximum(ret, Ta, mi);
-//            ret.maximum(frm);
-        }
-    }
-
-
+	/* Maximum intensity projection */
+	void Image3D::MIP(Image3D&ret,const TMat&T)const{int a_=2;
+		/* Get image boundaries */
+		TMat Ti(T.inv());int m[3],M[3];float d[3];
+		transformation_bounds(Ti,m,M);
+		for(int i=0;i<3;++i){d[i]=M[i]-m[i];}
+		/* Automagically re-center and avoid cropping */
+		Ti.translation(m[0],m[1],m[2]);TMat Ta(T*Ti);
+		Image3D frm;frm.resize(d[0],d[1],1);frm.md.mv=0;
+		/* initial value */
+		project_direct(frm,Ta,0);
+		ret=frm;
+		/* maximum project */
+		for(int mi=1;mi<d[a_];++mi){
+			project_if_max(frm,Ta,mi);
+			//XOR	project_direct(frm,Ta,mi);
+				//		ret.maximum(frm);
+				//XOR	ret.disjunct(frm);
+		}
+	}
+	
 	/* aggregator with memory */
-	void Image3D::operate_memo(const Image3D&img,std::vector<std::vector<unsigned int> >&memo){
-		int c1,cB,cD,cT;
-		c1=2;cB=32;cD=1,cT=16;//skull
+	void Image3D::operate_memo(const Image3D&img,std::vector<std::vector<unsigned int> >&memo,int c1){
+		int cB,cD,cT;
+		cB=32;cD=1,cT=16;//skull
 		//c1=2;cB=16;cD=1,cT=32;//brain
 		
 		for(int ix=0;ix<n[0];++ix){
@@ -650,7 +680,7 @@ namespace VoxelMap{
 	}
 	
 	/* aggregate all projections on axis a_ */
-	void Image3D::aggregate_projections(Image3D&ret,const TMat&T)const{int a_=2;
+	void Image3D::aggregate_projections(Image3D&ret,const TMat&T,int c1)const{int a_=2;
 		/* Get image boundaries */
 		TMat Ti(T.inv());int m[3],M[3];float d[3];
 		transformation_bounds(Ti,m,M);
@@ -659,15 +689,17 @@ namespace VoxelMap{
 		Ti.translation(m[0],m[1],m[2]);TMat Ta(T*Ti);
 		Image3D frm;frm.resize(d[0],d[1],1);frm.md.mv=0;
 		/* initial value */
-		simple_project(frm,Ta,0);
+		project_direct(frm,Ta,0);
 		ret=frm;
 		/* memory started as projection */
 		//Image3D memo(frm);
 		std::vector<std::vector<unsigned int> >memo(ret.get_n(0),std::vector<unsigned int>(ret.get_n(1),0));
 		/* project and aggregate */
 		for(int mi=1;mi<d[a_];++mi){//DBG(mi);
-			simple_project(frm,Ta,mi);
-            ret.operate_memo(frm,memo);
+			project_direct(frm,Ta,mi);
+			//ret.maximum(frm);
+			//ret.disjunct(frm);
+			ret.operate_memo(frm,memo);
 		}
 	}
 
@@ -890,7 +922,3 @@ namespace ImgMacro{
 	}
 
 }
-
-
-
-
