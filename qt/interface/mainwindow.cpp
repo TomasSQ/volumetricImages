@@ -133,26 +133,6 @@ void MainWindow::on_buttonColorize_clicked(bool b){
 
 void MainWindow::on_buttonRendering_clicked(bool b){
 
-//    using ImgMacro::pfx ;
-//    Image3D MIP;
-//    TMat tm,tmC,tmS,tmR1,tmR2,tmR3, tmT;
-//    tmR2.rotation(1,30);
-//    tmR3.rotation(2,180);
-//    tmT = tmR3 * tmR2;
-//    for(int fi=0;fi<360;fi+=15){
-//            tmR1.rotation(0,fi);
-//            tm = tmT*tmR1;
-
-
-//        img.MIP(MIP,tm);
-
-//        std::string fnm=pfx+"tmp/MIPfr2m/"+Util::padded_num(fi,3)+".ppm";ImgFormat::detect::write(MIP,fnm);
-//        std::cout<<fnm << std::endl;
-
-//    }
-//    ImageMagick::animate("tmp/MIPfr2m","tmp/MIPfr2m");
-
-
     r = new rendering(this,img);
     r->exec();
     delete r;

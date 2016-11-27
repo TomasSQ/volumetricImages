@@ -12,6 +12,12 @@ rendering::rendering(QWidget *parent, Image3D &img) :
 {
     ui->setupUi(this);
 
+    connect(ui->radioButton_AGP, SIGNAL(toggled(bool)), this, SLOT(radio_linear_toogle(bool)));
+    connect(ui->radioButton_MIP, SIGNAL(toggled(bool)), this, SLOT(radio_linear_toogle(bool)));
+
+    writeImage();
+
+
 }
 
 rendering::~rendering()
@@ -20,6 +26,11 @@ rendering::~rendering()
     delete ui;
 }
 
+
+
+void rendering::radio_linear_toogle(bool v){
+    writeImage();
+}
 
 void rendering::on_horizontalSlider_A_valueChanged(int v){
     writeImage();
@@ -42,10 +53,15 @@ void rendering::writeImage(){
     tmR2.rotation(1,ui->horizontalSlider_B->value());
     tmR3.rotation(2,ui->horizontalSlider_C->value());
     tm = tmR3*tmR2*tmR1;
-    img.aggregate_projections(MIP,tm);
 
+    Image3D b;
+    if(ui->radioButton_AGP->isChecked()){
+        img.aggregate_projections(b,tm);
+    } else {
+        img.MIP(b,tm);
+    }
 
-    libScnQt.generateInMemoryImg(MIP, &qBA);
+    libScnQt.generateInMemoryImg(b, &qBA);
 
     pix.loadFromData(qBA, "PPM");
     scene->clear();

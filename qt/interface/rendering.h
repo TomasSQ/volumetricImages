@@ -24,6 +24,7 @@ public slots:
     void on_horizontalSlider_A_valueChanged(int);
     void on_horizontalSlider_B_valueChanged(int);
     void on_horizontalSlider_C_valueChanged(int);
+    void radio_linear_toogle(bool);
 
 private:
     Ui::rendering *ui;
@@ -33,7 +34,6 @@ private:
     QGraphicsScene *scene;
     libscnqt libScnQt;
     QPixmap pix;
-    Image3D MIP;
     QByteArray qBA;
 };
 

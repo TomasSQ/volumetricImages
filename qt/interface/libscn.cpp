@@ -542,11 +542,12 @@ namespace VoxelMap{
 
 	/* ret already has correct size, dont compute bounds */
 	void Image3D::simple_project(Image3D&ret,const TMat&T,int p_)const{
-		float x,y,z;
 		int iz=p_;
+#pragma omp parallel for
 		for(int ix=0;ix<ret.get_n(0);++ix){
 		for(int iy=0;iy<ret.get_n(1);++iy){
-			T.appl(ix,iy,iz,x,y,z);
+            float x,y,z;
+            T.appl(ix,iy,iz,x,y,z);
 			ret.set(ix,iy,0, Image3D::get_NN(x,y,z) );
 			//ret.set(ix,iy,0, Image3D::get_trili(x,y,z) );
 		}}
@@ -554,10 +555,12 @@ namespace VoxelMap{
 
     /* ret already has correct size, dont compute bounds */
     void Image3D::project_with_maximum(Image3D& ret, const TMat&T,int p_) const {
-        float x,y,z;
+
         int iz=p_;
+#pragma omp parallel for
         for(int ix=0;ix<ret.get_n(0);++ix){
         for(int iy=0;iy<ret.get_n(1);++iy){
+            float x,y,z;
             T.appl(ix,iy,iz,x,y,z);
             if(ret.cref(ix,iy, 0) < Image3D::get_NN(x,y,z)){
                 ret.set(ix, iy, 0, Image3D::get_NN(x,y,z));
@@ -627,10 +630,10 @@ namespace VoxelMap{
 
 	/* aggregator with memory */
 	void Image3D::operate_memo(const Image3D&img,std::vector<std::vector<unsigned int> >&memo){
-		int c1,cB,cD,cT;
+        int c1,cB,cD,cT;
 		c1=2;cB=32;cD=1,cT=16;//skull
 		//c1=2;cB=16;cD=1,cT=32;//brain
-		
+#pragma omp parallel for
 		for(int ix=0;ix<n[0];++ix){
 		for(int iy=0;iy<n[1];++iy){
 		for(int iz=0;iz<n[2];++iz){

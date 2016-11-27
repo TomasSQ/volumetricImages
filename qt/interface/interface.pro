@@ -11,6 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = teste2
 TEMPLATE = app
+QMAKE_CXXFLAGS += -fopenmp
+LIBS += -fopenmp
 
 
 SOURCES += main.cpp\
