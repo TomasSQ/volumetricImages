@@ -12,6 +12,7 @@ rendering::rendering(QWidget *parent, Image3D &img) :
 {
     ui->setupUi(this);
 
+    ui->graphicsView->setMouseTracking(true);
     connect(ui->radioButton_AGP, SIGNAL(toggled(bool)), this, SLOT(radio_linear_toogle(bool)));
     connect(ui->radioButton_MIP, SIGNAL(toggled(bool)), this, SLOT(radio_linear_toogle(bool)));
 
@@ -61,7 +62,7 @@ void rendering::writeImage(){
         img.MIP(b,tm);
     }
 
-    libScnQt.generateInMemoryImg(b, &qBA);
+    libScnQt.generateInMemoryImgParallel(b, &qBA);
 
     pix.loadFromData(qBA, "PPM");
     scene->clear();

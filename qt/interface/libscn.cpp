@@ -296,7 +296,8 @@ namespace VoxelMap{
 		ret.n3=ret.n[0]*ret.n[1]*ret.n[2];
 		ret.md.mv = 0;
 		/* Copying cut */
-		ret.data      .resize(ret.n[0]);for(int xi=x0,x=0;x<ret.n[0];xi+=xd,++x){
+        ret.data      .resize(ret.n[0]);
+        for(int xi=x0,x=0;x<ret.n[0];xi+=xd,++x){
 		ret.data[x]   .resize(ret.n[1]);for(int yi=y0,y=0;y<ret.n[1];yi+=yd,++y){
 		ret.data[x][y].resize(ret.n[2]);                                        {
 					ret.set(x,y,0,get(pos(axis,plane,cut_axis[0],xi,cut_axis[1],yi)));

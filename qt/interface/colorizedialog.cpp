@@ -75,7 +75,7 @@ void ColorizeDialog::writeImage(){
     }
 
     QByteArray qBA;
-    libScnQt.generateInMemoryImg(cut, &qBA);
+    libScnQt.generateInMemoryImgParallel(cut, &qBA);
 
     pix.loadFromData(qBA, "PPM");
     scene->setSceneRect(pix.rect());

@@ -179,7 +179,7 @@ void MainWindow::fill_with_slices(void* v, float percent){
         }
     }
 
-    libScnQt.generateInMemoryImg(cut, &qBA);
+    libScnQt.generateInMemoryImgParallel(cut, &qBA);
 
     pix.loadFromData(qBA, "PPM");
     scene->setSceneRect(pix.rect());
@@ -189,7 +189,7 @@ void MainWindow::fill_with_slices(void* v, float percent){
     ui->graphicsView->update();
 
     qBA.clear();
-    libScnQt.generateInMemoryImg(cut2, &qBA);
+    libScnQt.generateInMemoryImgParallel(cut2, &qBA);
     pix2.loadFromData(qBA, "PPM");
     scene2->clear();
     scene2->addPixmap(pix2);
@@ -198,7 +198,7 @@ void MainWindow::fill_with_slices(void* v, float percent){
     ui->graphicsView_2->update();
 
     qBA.clear();
-    libScnQt.generateInMemoryImg(cut3, &qBA);
+    libScnQt.generateInMemoryImgParallel(cut3, &qBA);
     pix3.loadFromData(qBA, "PPM");
     scene3->clear();
     scene3->addPixmap(pix3);
