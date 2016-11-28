@@ -24,11 +24,14 @@ public slots:
     void on_horizontalSlider_A_valueChanged(int);
     void on_horizontalSlider_B_valueChanged(int);
     void on_horizontalSlider_C_valueChanged(int);
+    void on_horizontalSlider_A_sliderReleased();
+    void on_horizontalSlider_C_sliderReleased();
+    void on_horizontalSlider_B_sliderReleased();
     void radio_linear_toogle(bool);
 
 private:
     Ui::rendering *ui;
-    void writeImage();
+    void writeImage(bool);
     const Image3D &img;
     TMat tm,tmC,tmS,tmR1,tmR2,tmR3;
     QGraphicsScene *scene;

@@ -67,10 +67,11 @@ void ColorizeDialog::writeImage(){
     if(colorize){
         if(ui->radioButton_defaultPallete->isChecked()){
             colorizeValue = "default";
-            cut.apply_pallete();
+            cut.apply_pallete('R');
         } else {
             colorizeValue = "hsl2rgb";
-            cut.apply_pallete_over_HSL2RGB_space();
+            cut.apply_pallete();
+
         }
     }
 

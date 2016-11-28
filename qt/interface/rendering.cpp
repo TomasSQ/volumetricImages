@@ -16,7 +16,7 @@ rendering::rendering(QWidget *parent, Image3D &img) :
     connect(ui->radioButton_AGP, SIGNAL(toggled(bool)), this, SLOT(radio_linear_toogle(bool)));
     connect(ui->radioButton_MIP, SIGNAL(toggled(bool)), this, SLOT(radio_linear_toogle(bool)));
 
-    writeImage();
+    writeImage(true);
 
 
 }
@@ -30,25 +30,36 @@ rendering::~rendering()
 
 
 void rendering::radio_linear_toogle(bool v){
-    writeImage();
+    writeImage(true);
 }
 
 void rendering::on_horizontalSlider_A_valueChanged(int v){
-    writeImage();
+    writeImage(false);
 }
 
 
 void rendering::on_horizontalSlider_B_valueChanged(int v){
-    writeImage();
+    writeImage(false);
 
 }
 void rendering::on_horizontalSlider_C_valueChanged(int v){
-    writeImage();
+    writeImage(false);
 
 }
 
+void rendering::on_horizontalSlider_A_sliderReleased(){
+    writeImage(true);
+}
 
-void rendering::writeImage(){
+void rendering::on_horizontalSlider_B_sliderReleased(){
+    writeImage(true);
+}
+
+void rendering::on_horizontalSlider_C_sliderReleased(){
+    writeImage(true);
+}
+
+void rendering::writeImage(bool real){
 
     tmR1.rotation(0,ui->horizontalSlider_A->value());
     tmR2.rotation(1,ui->horizontalSlider_B->value());
@@ -56,10 +67,15 @@ void rendering::writeImage(){
     tm = tmR3*tmR2*tmR1;
 
     Image3D b;
+    if(!real){
+        img.quick_project(b, tm);
+
+    }else{
     if(ui->radioButton_AGP->isChecked()){
         img.aggregate_projections(b,tm);
     } else {
         img.MIP(b,tm);
+    }
     }
 
     libScnQt.generateInMemoryImgParallel(b, &qBA);

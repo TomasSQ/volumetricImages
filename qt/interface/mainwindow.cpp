@@ -152,9 +152,9 @@ void MainWindow::fill_with_slices(void* v, float percent){
     img->ort_plane(cut3, 2,value3, 0, 0,1);
 
     if(linear_transform){
-        cut.linear_transform(I1,I2,k1,k2);
-        cut2.linear_transform(I1,I2,k1,k2);
-        cut3.linear_transform(I1,I2,k1,k2);
+        cut.transform_lin(I1,I2,k1,k2);
+        cut2.transform_lin(I1,I2,k1,k2);
+        cut3.transform_lin(I1,I2,k1,k2);
     }
 
 
@@ -164,9 +164,9 @@ void MainWindow::fill_with_slices(void* v, float percent){
             cut2.apply_pallete();
             cut3.apply_pallete();
         } else if(colorize == "hsl2rgb") {
-            cut.apply_pallete_over_HSL2RGB_space();
-            cut2.apply_pallete_over_HSL2RGB_space();
-            cut3.apply_pallete_over_HSL2RGB_space();
+            cut.apply_pallete('R');
+            cut2.apply_pallete('R');
+            cut3.apply_pallete('R');
         } else{
             Image3D labelCut, labelCut2, labelCut3;
             imgLabel.ort_plane(labelCut, 0, value1, 0, 1, 1);

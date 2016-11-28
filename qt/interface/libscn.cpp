@@ -583,11 +583,12 @@ namespace VoxelMap{
 
 	/* ret already has correct size, dont compute bounds */
 	void Image3D::project_direct(Image3D&ret,const TMat&T,int p_)const{
-		float x,y,z;
+
 		int iz=p_;
 #pragma omp parallel for
 		for(int ix=0;ix<ret.get_n(0);++ix){
 		for(int iy=0;iy<ret.get_n(1);++iy){
+            float x,y,z;
 			T.appl(ix,iy,iz,x,y,z);
 			  ret.set(ix,iy,0, Image3D::get_NN   (x,y,z) );
 			//ret.set(ix,iy,0, Image3D::get_trili(x,y,z) );
@@ -596,12 +597,14 @@ namespace VoxelMap{
 	
 	/* ret already has correct size, dont compute bounds */
 	void Image3D::project_if_max(Image3D&ret,const TMat&T,int p_)const{
-		float x,y,z;
+
 		int iz=p_;
-		const Voxel* v_xyz;
+
 #pragma omp parallel for
 		for(int ix=0;ix<ret.get_n(0);++ix){
 		for(int iy=0;iy<ret.get_n(1);++iy){
+            const Voxel* v_xyz;
+            float x,y,z;
 			T.appl(ix,iy,iz,x,y,z);
 			v_xyz=&Image3D::get_NN(x,y,z);
 			if(ret.cref(ix,iy,0) < *v_xyz){
