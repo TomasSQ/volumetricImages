@@ -32,7 +32,7 @@ namespace ColorSpace{
 	/*         [0,360), [0,1] ,  [0,1]  */
 	t3r HSL2RGB(double H,double S,double L);
 
-	namespace BM2RW{
+	namespace KM2RW{
 		const int MAX=1792;
 		extern int T[1800][3];
 		extern bool v;
@@ -86,7 +86,7 @@ class Image3D{
 	using t3i=std::tuple<int,int,int>;
 	public:
 	std::vector<std::vector<std::vector<Voxel> > >data;
-	int n[3];int n3;
+	int n[3]={0};int n3=0;
 	MetaData md;
 
 	int get_n(int d)const;
@@ -129,14 +129,18 @@ class Image3D{
 
 	void map(std::function<void(Voxel&)>f);
 	template<class Compare>
-	Voxel top(Compare comp)const;
+	const Voxel& top(Compare comp)const;
 
 	/*TRF-2*/
-	void linear_transform(int I1,int I2,int k1,int k2);
+	void transform_lin(int I1,int I2,int k1,int k2);
+	void transform_pow(int I1,int I2,int k1,int k2,float exp=1.0);
+	void transform_log(int I1,int I2,int k1,int k2,float exp=1.0);
+	
+	void transform_lin_stretch(int k1=0,int k2=255);
 
 	/*TRF-3*/
-	void colorize(const Image3D&label);
-	void apply_pallete();
+	void colorize(const Image3D&label,double H_phs=120,double S_max=1,bool color_0=false);
+	void apply_pallete(char pallete='K');
 
 	/* ret must already be the same size of *this */
 	void erode_by_1(Image3D&ret)const;
@@ -150,20 +154,21 @@ class Image3D{
 	/* compute transformed image boundaries */
 	void transformation_bounds(const TMat&T,int m[3],int M[3])const;
 	/* geometric projection / get slice */
-	void simple_project(Image3D&ret,const TMat&T,int p_=0)const;
-	void        project(Image3D&ret,const TMat&T,int p_=0)const;
-    void project_with_maximum(Image3D& ret,const TMat&T,int p_)const ;
+	void project_direct(Image3D&ret,const TMat&T,int p_=0)const;
+	void project_tailor(Image3D&ret,const TMat&T,int p_=0)const;
+	
+	void project_if_max(Image3D&ret,const TMat&T,int p_=0)const;
+	void project_tshold(Image3D&ret,const TMat&T,int p_=0,int thold=64)const;
 	
 	/* img must be the same size of *this */
 	void maximum(const Image3D&img);
 	void disjunct(const Image3D&img);
 	/* Maximum intensity projection */
 	void MIP(Image3D&ret,const TMat&T)const;
+	void quick_project(Image3D&ret,const TMat&T)const;
 	
-	void operate_memo(const Image3D&img,std::vector<std::vector<unsigned int> >&memo);
-	void aggregate_projections(Image3D&ret,const TMat&T)const;
-
-    void apply_pallete_over_HSL2RGB_space();
+	void operate_memo(const Image3D&img,std::vector<std::vector<unsigned int> >&memo,int c1=2,int cB=32,int cD=1,int cT=16);
+	void aggregate_projections(Image3D&ret,const TMat&T,int c1=2,int cB=32,int cD=1,int cT=16)const;
 
 };
 /* Functions for Images */
