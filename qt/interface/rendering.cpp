@@ -15,6 +15,7 @@ rendering::rendering(QWidget *parent, Image3D &img) :
     ui->graphicsView->setMouseTracking(true);
     connect(ui->radioButton_AGP, SIGNAL(toggled(bool)), this, SLOT(radio_linear_toogle(bool)));
     connect(ui->radioButton_MIP, SIGNAL(toggled(bool)), this, SLOT(radio_linear_toogle(bool)));
+    connect(ui->radioButton_Phong, SIGNAL(toggled(bool)), this, SLOT(radio_linear_toogle(bool)));
 
     writeImage(true);
 
@@ -71,11 +72,14 @@ void rendering::writeImage(bool real){
         img.quick_project(b, tm);
 
     }else{
-    if(ui->radioButton_AGP->isChecked()){
-        img.aggregate_projections(b,tm);
-    } else {
-        img.MIP(b,tm);
-    }
+        if(ui->radioButton_AGP->isChecked()){
+            img.aggregate_projections(b,tm);
+        } else if(ui->radioButton_MIP->isChecked()) {
+            img.MIP(b,tm);
+        }else{
+
+            img.project_aphong(b, tm);
+        }
     }
 
     libScnQt.generateInMemoryImgParallel(b, &qBA);

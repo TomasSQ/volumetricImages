@@ -5,10 +5,13 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <functional>
+#include <sstream>
 
 #include <sstream>
 #define fst	first
 #define snd	second
+
 
 /* Non-image related utils */
 namespace Util{
