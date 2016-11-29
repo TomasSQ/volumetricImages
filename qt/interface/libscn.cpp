@@ -898,6 +898,53 @@ namespace VoxelMap{
 		}
 	}
 
+
+    /* Phong */
+    void Image3D::project_quick2(Image3D&ret,const TMat&T)const{int a_=2;
+        /* Get image boundaries */
+            TMat Ti(T.inv());int m[3],M[3];float d[3];
+            transformation_bounds(Ti,m,M);
+            for(int i=0;i<3;++i){d[i]=M[i]-m[i];}
+        /* Quick size & center */
+            int nmax = std::max(get_n(0),std::max(get_n(1),get_n(2)))/1;
+            int q[3];
+            for(int i=0;i<3;++i){q[i]=m[i]+(d[i]-nmax)/2;}
+
+        Ti.translation(q[0],q[1],q[2]);TMat Ta(T*Ti);
+        ret.resize(nmax,nmax,1);ret.md.mv=0;
+        /* optimized projection */{
+
+
+            project_direct(ret,Ta,0);
+
+#pragma omp parallel for
+            for(int ix=0;ix<ret.get_n(0);++ix){
+            for(int iy=0;iy<ret.get_n(1);++iy){
+                for(int iz=1;iz<d[a_];iz+=1){
+
+                    float x,y,z;
+                    int thold=32;
+                    const Voxel* v_xyz;
+
+                    Ta.appl(ix,iy,iz,x,y,z);
+                    v_xyz=&Image3D::get_NN(x,y,z);
+
+                    bool hit_obj(true);
+                    hit_obj=(v_xyz->to_ulong()>thold);
+                    if(!hit_obj){continue;}
+
+                    float val=255.0-std::min(255.0,(iz*2.0));
+
+                    if( val>255) val=255;
+                    ret.set(ix,iy,0,VoxelMap::transform(val));
+                    break;
+
+                }
+
+            }}
+        }
+    }
+
 /*};*/
 
 /* Functions for Images */

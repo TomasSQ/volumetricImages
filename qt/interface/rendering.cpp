@@ -69,7 +69,7 @@ void rendering::writeImage(bool real){
 
     Image3D b;
     if(!real){
-        img.quick_project(b, tm);
+        img.project_quick2(b, tm);
 
     }else{
         if(ui->radioButton_AGP->isChecked()){
@@ -77,7 +77,6 @@ void rendering::writeImage(bool real){
         } else if(ui->radioButton_MIP->isChecked()) {
             img.MIP(b,tm);
         }else{
-
             img.project_aphong(b, tm);
         }
     }

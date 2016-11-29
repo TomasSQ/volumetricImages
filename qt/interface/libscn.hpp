@@ -175,6 +175,7 @@ class Image3D{
 	
 	float reflectance(int x,int y,int z,const TMat&T,const std::list<std::pair<int,int> >&lV)const;
 	void project_aphong(Image3D&ret,const TMat&T)const;
+    void project_quick2(Image3D&ret,const TMat&T)const;
 };
 /* Functions for Images */
 namespace ImageFunc{
