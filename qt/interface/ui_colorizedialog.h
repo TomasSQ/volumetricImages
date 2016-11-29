@@ -68,7 +68,7 @@ public:
 
     void retranslateUi(QDialog *ColorizeDialog)
     {
-        ColorizeDialog->setWindowTitle(QApplication::translate("ColorizeDialog", "Dialog", 0));
+        ColorizeDialog->setWindowTitle(QApplication::translate("ColorizeDialog", "Colorize Dialog", 0));
         button_apply_pallete->setText(QApplication::translate("ColorizeDialog", "Apply Pallete", 0));
         button_loadLabel->setText(QApplication::translate("ColorizeDialog", "Load Label", 0));
         radioButton_defaultPallete->setText(QApplication::translate("ColorizeDialog", "Default Pallete", 0));

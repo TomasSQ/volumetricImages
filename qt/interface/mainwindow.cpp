@@ -24,6 +24,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 }
 
+void MainWindow::on_horizontalSlider_sliderMoved(int a){
+    std::cout << "SLIDER MOVED "<< a << std::endl;
+
+}
+
 void MainWindow::on_radio_linear_toogle(bool t){
     if (ui->radioButton_std->isChecked()){
         linear_transform = false;
@@ -79,6 +84,7 @@ void MainWindow::on_openAction(bool s){
          ui->groupBox->setEnabled(true);
          ui->horizontalSlider->setEnabled(true);
          ui->buttonColorize->setEnabled(true);
+         ui->buttonRendering->setEnabled(true);
          scene = new QGraphicsScene(this);
          scene2 = new QGraphicsScene(this);
          scene3 = new QGraphicsScene(this);

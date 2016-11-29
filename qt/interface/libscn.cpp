@@ -6,8 +6,7 @@
 #include <iostream>
 #include <iomanip>
 
-#define fst	first
-#define snd	second
+#include <sstream>
 
 /* Non-image related utils */
 namespace Util{
