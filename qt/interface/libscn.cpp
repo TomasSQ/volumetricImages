@@ -6,6 +6,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include <sstream>
+
 /* Non-image related utils */
 namespace Util{
 	std::string padded_num(int n,int pad){

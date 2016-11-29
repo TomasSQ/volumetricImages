@@ -29,6 +29,7 @@ public slots:
     void on_radio_linear_toogle(bool);
     void on_horizontalSlider_transformationsB_valueChanged(int);
     void on_horizontalSlider_transformationsA_valueChanged(int);
+    void on_horizontalSlider_sliderMoved(int);
     void on_buttonColorize_clicked(bool);
     void on_buttonRendering_clicked(bool);
 

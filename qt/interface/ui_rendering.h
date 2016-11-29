@@ -82,7 +82,7 @@ public:
 
     void retranslateUi(QDialog *rendering)
     {
-        rendering->setWindowTitle(QApplication::translate("rendering", "Dialog", 0));
+        rendering->setWindowTitle(QApplication::translate("rendering", "Rendering Window", 0));
         radioButton_MIP->setText(QApplication::translate("rendering", "MIP", 0));
         radioButton_AGP->setText(QApplication::translate("rendering", "Aggregate Projections", 0));
     } // retranslateUi

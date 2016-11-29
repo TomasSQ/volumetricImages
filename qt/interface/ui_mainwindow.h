@@ -119,6 +119,7 @@ public:
         buttonColorize->setGeometry(QRect(670, 330, 80, 23));
         buttonRendering = new QPushButton(centralWidget);
         buttonRendering->setObjectName(QStringLiteral("buttonRendering"));
+        buttonRendering->setEnabled(false);
         buttonRendering->setGeometry(QRect(670, 370, 80, 23));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
