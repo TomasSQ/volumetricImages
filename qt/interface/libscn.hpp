@@ -5,6 +5,7 @@
 #include "tmat.hpp"
 
 #include <vector>
+#include <list>
 #include <bitset>
 #include <functional>
 
@@ -169,7 +170,11 @@ class Image3D{
 	
 	void operate_memo(const Image3D&img,std::vector<std::vector<unsigned int> >&memo,int c1=2,int cB=32,int cD=1,int cT=16);
 	void aggregate_projections(Image3D&ret,const TMat&T,int c1=2,int cB=32,int cD=1,int cT=16)const;
-
+	
+	void gradient_simple(Image3D&ret)const;
+	
+	float reflectance(int x,int y,int z,const TMat&T,const std::list<std::pair<int,int> >&lV)const;
+	void project_aphong(Image3D&ret,const TMat&T)const;
 };
 /* Functions for Images */
 namespace ImageFunc{

@@ -7,6 +7,8 @@
 #include <iomanip>
 
 #include <sstream>
+#define fst	first
+#define snd	second
 
 /* Non-image related utils */
 namespace Util{
@@ -93,11 +95,11 @@ namespace ColorSpace{
 	auto Voxel::num_channels()const{return value.size();}
 	auto Voxel::num_bytes()   const{return value.empty()?0:value[0].size();}
 	unsigned long long Voxel::to_ullong(int ic)const{unsigned long long ret(0);int ib(0);
-		for(auto const &b:value[ic])ret+=(b.to_ullong()<<((ib++)*8));
+		for(auto const &b:value[ic%num_channels()])ret+=(b.to_ullong()<<((ib++)*8));
 		return ret;
 	}
 	unsigned long Voxel::to_ulong(int ic)const{unsigned long ret(0);int ib(0);
-		for(auto const &b:value[ic])ret+=(b.to_ulong()<<((ib++)*8));
+		for(auto const &b:value[ic%num_channels()])ret+=(b.to_ulong()<<((ib++)*8));
 		return ret;
 	}
 	bool Voxel::operator==(const Voxel& rhs)const{return value==rhs.value;}
@@ -585,12 +587,12 @@ namespace VoxelMap{
 
 	/* ret already has correct size, dont compute bounds */
 	void Image3D::project_direct(Image3D&ret,const TMat&T,int p_)const{
-
 		int iz=p_;
 #pragma omp parallel for
 		for(int ix=0;ix<ret.get_n(0);++ix){
 		for(int iy=0;iy<ret.get_n(1);++iy){
-            float x,y,z;
+			float x,y,z;
+			
 			T.appl(ix,iy,iz,x,y,z);
 			  ret.set(ix,iy,0, Image3D::get_NN   (x,y,z) );
 			//ret.set(ix,iy,0, Image3D::get_trili(x,y,z) );
@@ -599,14 +601,13 @@ namespace VoxelMap{
 	
 	/* ret already has correct size, dont compute bounds */
 	void Image3D::project_if_max(Image3D&ret,const TMat&T,int p_)const{
-
 		int iz=p_;
-
 #pragma omp parallel for
 		for(int ix=0;ix<ret.get_n(0);++ix){
 		for(int iy=0;iy<ret.get_n(1);++iy){
-            const Voxel* v_xyz;
-            float x,y,z;
+			float x,y,z;
+			const Voxel* v_xyz;
+			
 			T.appl(ix,iy,iz,x,y,z);
 			v_xyz=&Image3D::get_NN(x,y,z);
 			if(ret.cref(ix,iy,0) < *v_xyz){
@@ -693,8 +694,6 @@ namespace VoxelMap{
 		TMat Ti(T.inv());int m[3],M[3];float d[3];
 		transformation_bounds(Ti,m,M);
 		for(int i=0;i<3;++i){d[i]=M[i]-m[i];}
-		/* Automagically re-center and avoid cropping */
-		
 		/* Quick size & center */
 		int nmax = std::max(get_n(0),std::max(get_n(1),get_n(2)))/1;
 		int q[3];
@@ -703,27 +702,29 @@ namespace VoxelMap{
 		
 		ret.resize(nmax,nmax,1);ret.md.mv=0;
 		
-		/* optimized projection */
-		float x,y,z;
-		int thold=64;
-		const Voxel* v_xyz;
-		
-		project_direct(ret,Ta,0);
-
-		for(int ix=0;ix<ret.get_n(0);++ix){
-		for(int iy=0;iy<ret.get_n(1);++iy){
-			
-			for(int iz=1;iz<d[a_]/2;iz+=2){
-				Ta.appl(ix,iy,iz,x,y,z);
-				v_xyz=&Image3D::get_NN(x,y,z);
+		/* optimized projection */{
+			float x,y,z;
+			const int thold=16;
+			const Voxel* v_xyz;
+			project_direct(ret,Ta,0);
+			for(int ix=0;ix<ret.get_n(0);++ix){
+			for(int iy=0;iy<ret.get_n(1);++iy){
 				
-				if(v_xyz->to_ulong()>thold){
-					ret.set(ix,iy,0,*v_xyz);
-					break;
+				for(int iz=1;iz<d[a_]/2;iz+=2){
+					Ta.appl(ix,iy,iz,x,y,z);
+					v_xyz=&Image3D::get_NN(x,y,z);
+					
+					bool stop_cond(true);
+					/*hit*/			stop_cond=(v_xyz->to_ulong()>thold);
+					/*3hit*///		stop_cond=(v_xyz->to_ulong(0)+v_xyz->to_ulong(1)+v_xyz->to_ulong(2)>thold);
+					/*3avgdst*///	stop_cond=(fabs(((v_xyz->to_ulong(0)+v_xyz->to_ulong(1)+v_xyz->to_ulong(2))/3)-255)>thold);
+					if(stop_cond){
+						ret.set(ix,iy,0,*v_xyz);
+						break;
+					}
 				}
-			}
-		}}
-		
+			}}
+		}
 	}
 	
 	/* aggregator with memory */
@@ -770,6 +771,127 @@ namespace VoxelMap{
 			//ret.maximum(frm);
 			//ret.disjunct(frm);
 			ret.operate_memo(frm,memo,c1,cB,cD,cT);
+		}
+	}
+
+	/* gradient calculation */
+	void Image3D::gradient_simple(Image3D&ret)const{
+		//ret.resize(get_n(0),get_n(1),get_n(2));
+		ret = *this;
+		for(int ix=1;ix<ret.n[0]-1;++ix){
+		for(int iy=1;iy<ret.n[1]-1;++iy){
+		for(int iz=1;iz<ret.n[2]-1;++iz){
+			int d0 = cref(ix+1,iy  ,iz  ).to_ulong()-cref(ix-1,iy  ,iz  ).to_ulong();
+			int d1 = cref(ix  ,iy+1,iz  ).to_ulong()-cref(ix  ,iy-1,iz  ).to_ulong();
+			int d2 = cref(ix  ,iy  ,iz+1).to_ulong()-cref(ix  ,iy  ,iz-1).to_ulong();
+
+			d0=(d0+255)/2;
+			d1=(d1+255)/2;
+			d2=(d2+255)/2;
+
+			ret.set(ix,iy,iz,VoxelMap::transform(t3i(d0,d1,d2)));
+		}}}
+	}
+
+	/* reflectance of voxel */
+	float Image3D::reflectance(int x,int y,int z,const TMat&Ta,const std::list<std::pair<int,int> >&V)const{
+		float sum,max;sum=0;max=0;
+		for(auto const &v:V){
+			float x0,y0,z0;
+			float x1,y1,z1;
+			Ta.appl(x+v.fst,y+v.snd,z, x0,y0,z0);
+			Ta.appl(x-v.fst,y-v.snd,z, x1,y1,z1);
+			float d=fabs( static_cast<float>(Image3D::get_NN(x0,y0,z0).to_ulong())-static_cast<float>(Image3D::get_NN(x1,y1,z1).to_ulong()) );
+			sum+=d;
+			max+=255;
+		}
+		return (1.0-(sum/max));
+		//return (255.0-(sum/max));
+	}
+
+	/* Phong */
+	void Image3D::project_aphong(Image3D&ret,const TMat&T)const{int a_=2;
+		/* Get image boundaries */
+			TMat Ti(T.inv());int m[3],M[3];float d[3];
+			transformation_bounds(Ti,m,M);
+			for(int i=0;i<3;++i){d[i]=M[i]-m[i];}
+		/* Quick size & center */
+			int nmax = std::max(get_n(0),std::max(get_n(1),get_n(2)))/1;
+			int q[3];
+			for(int i=0;i<3;++i){q[i]=m[i]+(d[i]-nmax)/2;}
+			
+		Ti.translation(q[0],q[1],q[2]);TMat Ta(T*Ti);
+		ret.resize(nmax,nmax,1);ret.md.mv=0;
+		/* optimized projection */{
+			float x,y,z;
+			int thold=32;
+			const Voxel* v_xyz;
+			bool opaque=true;
+			
+			std::list<std::pair<int,int> > lV;
+				/*	   n
+					 lgehk
+					 idacj
+					mfb bfm
+					 jcadi
+					 khegl
+					   n	*/
+			lV.push_back({0,1});lV.push_back({1,0});	// a b
+			lV.push_back({1,1});lV.push_back({1,-1});	// c d
+			lV.push_back({0,2});lV.push_back({2,0});	// e f
+			lV.push_back({1,2});lV.push_back({2,1});	// g h
+			lV.push_back({1,-2});lV.push_back({2,-1});	// i j
+			 lV.push_back({2,2});lV.push_back({2,-2});	// k l
+			lV.push_back({0,3});lV.push_back({3,0});	// m n
+			
+			project_direct(ret,Ta,0);
+			for(int ix=0;ix<ret.get_n(0);++ix){
+			for(int iy=0;iy<ret.get_n(1);++iy){
+				float acc_val=0;float ray=1;
+				for(int iz=1;iz<d[a_];iz+=1){
+					Ta.appl(ix,iy,iz,x,y,z);
+					v_xyz=&Image3D::get_NN(x,y,z);
+					
+					bool hit_obj(true);
+					hit_obj=(v_xyz->to_ulong()>thold);
+					if(!hit_obj){continue;}
+					
+					float rfl=reflectance(ix,iy,iz,Ta,lV);
+					
+					//float rl1=255*rfl;
+					float rl1=255.0*pow(rfl,2.0);
+					float rl2=255.0*pow(rfl,12.0);
+					float bck=static_cast<float>(v_xyz->to_ulong());
+					float dst=255.0-std::min(255.0,(iz*0.4));
+					
+					//int val=bck*0.0 + rl1*0.5 + rl2*0.3 + dst*0.3;
+					//int val=  ( rl1*0.5 + rl2*0.2 + dst*0.3 );
+					int    val=	(dst/255.0) * ( rl1*0.5 + rl2*0.2 + dst*0.3 );
+					float fval=	(dst/255.0) * ( rl1*0.5 + rl2*0.2 + dst*0.3 );
+					//gold://float fval=	(dst/255.0) * ( rl1*0.4 + rl2*0.3 + dst*0.4 );
+					
+					if( val>255) val=255;
+					if(fval>255)fval=255;
+					
+					if(opaque){
+						ret.set(ix,iy,0,VoxelMap::transform(val));
+						/*Gold:*///ret.set(ix,iy,0,VoxelMap::transform(ColorSpace::HSL2RGB(51,1.0,fval/255.0)));
+						//ret.set(ix,iy,0,*v_xyz);
+						break;
+					}
+					else{
+						acc_val += (0.25*fval)/ray;
+						ray+=bck/128;
+					}
+					
+				}
+				
+				if(!opaque){
+					if(acc_val>255)acc_val=255;
+					//ret.set(ix,iy,0,VoxelMap::transform(acc_val));
+					/*Gold:*/ret.set(ix,iy,0,VoxelMap::transform(ColorSpace::HSL2RGB(209,1.0,static_cast<float>(acc_val)/255.0)));
+				}
+			}}
 		}
 	}
 
