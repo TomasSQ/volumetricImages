@@ -32,6 +32,7 @@ public:
     QSlider *horizontalSlider_C;
     QRadioButton *radioButton_MIP;
     QRadioButton *radioButton_AGP;
+    QRadioButton *radioButton_Phong;
 
     void setupUi(QDialog *rendering)
     {
@@ -72,6 +73,9 @@ public:
         radioButton_AGP = new QRadioButton(rendering);
         radioButton_AGP->setObjectName(QStringLiteral("radioButton_AGP"));
         radioButton_AGP->setGeometry(QRect(590, 130, 171, 21));
+        radioButton_Phong = new QRadioButton(rendering);
+        radioButton_Phong->setObjectName(QStringLiteral("radioButton_Phong"));
+        radioButton_Phong->setGeometry(QRect(590, 170, 171, 21));
 
         retranslateUi(rendering);
         QObject::connect(buttonBox, SIGNAL(accepted()), rendering, SLOT(accept()));
@@ -85,6 +89,7 @@ public:
         rendering->setWindowTitle(QApplication::translate("rendering", "Rendering Window", 0));
         radioButton_MIP->setText(QApplication::translate("rendering", "MIP", 0));
         radioButton_AGP->setText(QApplication::translate("rendering", "Aggregate Projections", 0));
+        radioButton_Phong->setText(QApplication::translate("rendering", "Phong", 0));
     } // retranslateUi
 
 };

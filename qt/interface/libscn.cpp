@@ -5,8 +5,11 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-
+#include <functional>
 #include <sstream>
+
+#define snd second
+#define fst first
 
 /* Non-image related utils */
 namespace Util{
