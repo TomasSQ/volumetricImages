@@ -797,16 +797,19 @@ namespace VoxelMap{
 	}
 
 	/* reflectance of voxel */
-	float Image3D::reflectance(int x,int y,int z,const TMat&Ta,const std::list<std::pair<int,int> >&V)const{
+	float Image3D::reflectance(int x,int y,int z,const TMat&T,const std::list<std::pair<int,int> >&V)const{
 		float sum,max;sum=0;max=0;
 		for(auto const &v:V){
-			float x0,y0,z0;
-			float x1,y1,z1;
-			Ta.appl(x+v.fst,y+v.snd,z, x0,y0,z0);
-			Ta.appl(x-v.fst,y-v.snd,z, x1,y1,z1);
-			float d=fabs( static_cast<float>(Image3D::get_NN(x0,y0,z0).to_ulong())-static_cast<float>(Image3D::get_NN(x1,y1,z1).to_ulong()) );
-			sum+=d;
-			max+=255;
+			for(int dz=0;dz<6;++dz){
+				float x0,y0,z0;
+				float x1,y1,z1;
+				T.appl(x+v.fst,y+v.snd,	z+dz, x0,y0,z0);
+				T.appl(x-v.fst,y-v.snd,	z+dz, x1,y1,z1);
+				const float l=(2.0*sqrt(v.fst*v.fst+v.snd*v.snd))+(dz*0+0);
+				const float d=fabs( static_cast<float>(Image3D::get_NN(x0,y0,z0).to_ulong())-static_cast<float>(Image3D::get_NN(x1,y1,z1).to_ulong()) );
+				sum+=d/l;
+				max+=255.0/l;
+			}
 		}
 		return (1.0-(sum/max));
 		//return (255.0-(sum/max));
